@@ -40,7 +40,7 @@ public final class TimeAxis
         return;
     }
 
-    public static HashMap<String, InternalAxis> InvertedMap(HashMap<String, InternalAxis> invertTheMap) {
+    public static HashMap<String, InternalAxis> InvertedMap(Map<String, InternalAxis> invertTheMap) {
 		Set<Entry<String, InternalAxis>> set = invertTheMap.entrySet();
 		ArrayList<Entry<String, InternalAxis>> arrayList = new ArrayList<>(set);
  
@@ -72,11 +72,11 @@ public final class TimeAxis
             // scanning all rowColumns times compare current times.
             // Data will be recycled after 24 hours
             //
-            // @See current > MAX_FREEZING_TIMES_HOURS
+            // @See current >= MAX_FREEZING_TIMES_HOURS
             //
             // @apiNote Used blocking policy packing to Disk changed the cold datas, saving memory
             //
-            
+            HashMap<String, InternalAxis> freezMaps = TimeAxis.InvertedMap(maps);
 		}).start();
     }
 
