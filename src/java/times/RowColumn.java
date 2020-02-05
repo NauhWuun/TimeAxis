@@ -81,17 +81,6 @@ public final class RowColumn
         return new Pair<>(date2Stamp(createdateTime()), Block.fromBytes(hotdata));
     }
 
-    public void toLocalDisk() {
-        // store data to local disk.
-        HbaseJ.setUp();
-        HbaseJ.createTable(name);
-        HBaseJ.shutDown();
-    }
-
-    public void loadDisktoMemory() {
-        // loading local data to memory
-    }
-
     public Pair<Long, Void> flushData() {
         return new Pair<>(date2Stamp(createdateTime()), Void.TYPE);
     }

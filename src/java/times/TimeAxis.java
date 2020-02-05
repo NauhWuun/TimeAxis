@@ -47,7 +47,7 @@ public final class TimeAxis
 		Collections.sort(arrayList, new Comparator<Entry<String, InternalAxis>>() {
             @Override
 			public int compare(Entry<String, InternalAxis> arg0, Entry<String, InternalAxis> arg1) {
-				return (int) (arg1.getValue().getRowColumn().getCurrentTimestamp() - arg0.getValue().getRowColumn().getCurrentTimestamp());
+				return (arg1.getValue().getRowColumn().getCurrentTimestamp().compare(arg0.getValue().getRowColumn().getCurrentTimestamp()));
 			}
 		});
 		
@@ -59,6 +59,17 @@ public final class TimeAxis
 		}
  
 		return map;
+    }
+
+    public void toLocalDisk() {
+        // store data to local disk.
+        HbaseJ.setUp();
+        HbaseJ.createTable(name);
+        HBaseJ.shutDown();
+    }
+
+    public void loadDisktoMemory() {
+        // loading local data to memory
     }
     
     /**
