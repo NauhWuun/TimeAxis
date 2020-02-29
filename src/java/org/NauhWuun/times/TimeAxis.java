@@ -1,31 +1,40 @@
 package org.NauhWuun.times;
 
-import com.times.RowCols.RowColumn;
+import org.NauhWuun.times.RowCols.RowColumn;
+import org.rocksdb.RocksDB;
 
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public final class TimeAxis
 {
-    private int MAX_FREEZING_TIMES_HOURS = 24;
+    private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
+    private static Map<String, InternalAxis> maps;
 
-    private Map<String, InternalAxis> maps;
+    static{
+        RocksDB.loadLibrary();
+    }
+
+    static RocksDB rocksDB;
 
     public TimeAxis() {
-        maps = new HashMap<String, InternalAxis>();
+        maps = new HashMap<>();
+        freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, 30, TimeUnit.SECONDS);
     }
 
     public TimeAxis Builder() {
         return this;
     }
 
-    public TimeAxis createRowColumn(final String describe, final String name) {
+    public TimeAxis createRowColumn(final String describe, final String name) throws ParseException {
         RowColumn rc = new RowColumn(describe, name);
         InternalAxis ia = new InternalAxis(name, rc);
 
@@ -38,61 +47,53 @@ public final class TimeAxis
         return this;
     }
 
-    public void Finish() {
-        return;
-    }
-
     public static HashMap<String, InternalAxis> InvertedMap(Map<String, InternalAxis> invertTheMap) {
 		Set<Entry<String, InternalAxis>> set = invertTheMap.entrySet();
 		ArrayList<Entry<String, InternalAxis>> arrayList = new ArrayList<>(set);
  
-		Collections.sort(arrayList, new Comparator<Entry<String, InternalAxis>>() {
-            @Override
-			public int compare(Entry<String, InternalAxis> arg0, Entry<String, InternalAxis> arg1) {
-                return (arg1.getValue().getRowColumn().getCurrentTimestamp()).compareTo(
-                        arg0.getValue().getRowColumn().getCurrentTimestamp());
-			}
-		});
+		arrayList.sort((arg0, arg1) -> (arg1.getValue().getRowColumn().getCurrentTimestamp())
+                .compareTo(arg0.getValue().getRowColumn().getCurrentTimestamp()));
 		
 		LinkedHashMap<String, InternalAxis> map = new LinkedHashMap<>();
- 
-		for (int i = 0; i < arrayList.size(); i++) {
-			Entry<String, InternalAxis> entry = arrayList.get(i);
-			map.put(entry.getKey(), entry.getValue());
-		}
+        for (Entry<String, InternalAxis> entry : arrayList) {
+            map.put(entry.getKey(), entry.getValue());
+        }
  
 		return map;
     }
 
     public void toLocalDisk() {
         // store data to local disk.
+        this.shutdownFreezing();
+
     }
 
     public void loadDisktoMemory() {
         // loading local data to memory
-    }
-    
-    /**
-     * Auto freezing more than 24 hours datas
 
-     */
-    private void autoFreezing() {
-        new Thread(()-> 
-        {
-            //
-            // scanning all rowColumns times compare current times.
-            // Data will be recycled after 24 hours
-            //
-            // @See current >= MAX_FREEZING_TIMES_HOURS
-            //
-            // @apiNote Used blocking policy packing to Disk changed the cold datas, saving memory
-            //
-            HashMap<String, InternalAxis> freezMaps = TimeAxis.InvertedMap(maps);
-		}).start();
+    }
+
+    private void shutdownFreezing() {
+        System.out.println("ShutDown Freezing... \r\n");
+
+        freezing.shutdownNow();
+
+        try {
+            Thread.sleep(0);
+        } catch (InterruptedException e) {
+            e.notify();
+        }
     }
 
     @Override
     public String toString() {
         return "Time-Axis DataBase";
+    }
+
+    /**
+     * Auto freezing more than 24 hours data
+     */
+    private static void autoFreezing() {
+        
     }
 }
