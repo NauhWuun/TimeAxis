@@ -2,7 +2,9 @@ package org.NauhWuun.times.RowCols;
 
 import org.NauhWuun.times.Blocks.Block;
 import org.NauhWuun.times.Until.Pair;
+import org.NauhWuun.times.Until.RockRand;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -15,13 +17,14 @@ import java.util.TimeZone;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public final class RowColumn
+public final class RowColumn implements Serializable
 {
     /**
-     * column describe commmen name
+     * column describe name
      */
     private final String describe, name;
     private long initTimeStamp;
+    private long id;
 
     /**
      * @see SortedMap Type
@@ -40,6 +43,7 @@ public final class RowColumn
         this.describe = describe;
         this.name = name;
         this.initTimeStamp = date2Stamp(createdateTime());
+        this.id = RockRand.getUnsignedLong();
 
         tags = new TreeMap<Object, Object>();
 
@@ -157,6 +161,8 @@ public final class RowColumn
     public Long getCurrentTimestamp() {
         return date2Stamp(createdateTime());
     }
+
+    public final long getRowColumnID() { return id; }
 
     /**
      * TimeStamp Function(s)
