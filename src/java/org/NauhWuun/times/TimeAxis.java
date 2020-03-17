@@ -19,12 +19,6 @@ public final class TimeAxis
     private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
     private static Map<String, InternalAxis> maps;
 
-    static{
-        RocksDB.loadLibrary();
-    }
-
-    static RocksDB rocksDB;
-
     public TimeAxis() {
         maps = new HashMap<>();
         freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, 30, TimeUnit.SECONDS);
@@ -62,20 +56,18 @@ public final class TimeAxis
 		return map;
     }
 
-    public void toLocalDisk() {
-        // store data to local disk.
-        this.shutdownFreezing();
-
+    private void toLocalDisk() {
+        
     }
 
     public void loadDisktoMemory() {
-        // loading local data to memory
-
+        
     }
 
-    private void shutdownFreezing() {
+    public void shutDown() {
         System.out.println("ShutDown Freezing... \r\n");
 
+        this.toLocalDisk();
         freezing.shutdownNow();
 
         try {
@@ -90,9 +82,6 @@ public final class TimeAxis
         return "Time-Axis DataBase";
     }
 
-    /**
-     * Auto freezing more than 24 hours data
-     */
     private static void autoFreezing() {
         
     }
