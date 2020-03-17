@@ -19,9 +19,13 @@ public final class TimeAxis
     private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
     private static Map<String, InternalAxis> maps;
 
+    private LocalDB timeDB;
+
     public TimeAxis() {
+        timeDB = new LocalDB("TimeAxis.db");
         maps = new HashMap<>();
-        freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, 30, TimeUnit.SECONDS);
+
+        freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, 3, TimeUnit.SECONDS);
     }
 
     public TimeAxis Builder() {
@@ -56,18 +60,8 @@ public final class TimeAxis
 		return map;
     }
 
-    private void toLocalDisk() {
-        
-    }
-
-    public void loadDisktoMemory() {
-        
-    }
-
     public void shutDown() {
         System.out.println("ShutDown Freezing... \r\n");
-
-        this.toLocalDisk();
         freezing.shutdownNow();
 
         try {
@@ -83,6 +77,6 @@ public final class TimeAxis
     }
 
     private static void autoFreezing() {
-        
+        Block block = new Block(maps.);
     }
 }

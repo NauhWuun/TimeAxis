@@ -2,7 +2,7 @@ package org.NauhWuun.times.DataBase;
 
 import org.rocksdb.RocksDB;
 
-public class LocalDB
+public final class LocalDB
 {
     static {
         RocksDB.loadLibrary();
