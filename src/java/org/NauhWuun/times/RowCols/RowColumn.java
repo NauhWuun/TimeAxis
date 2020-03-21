@@ -17,28 +17,16 @@ import java.util.TimeZone;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public final class RowColumn implements Serializable
+public final class RowColumn
 {
-    /**
-     * column describe name
-     */
     private final String describe, name;
     private long initTimeStamp;
     private long id;
 
-    /**
-     * @see SortedMap Type
-     */
     private SortedMap<Object, Object> tags;
     private Set<Map.Entry<Object, Object>> sortEntry;
     private Iterator<Map.Entry<Object, Object>> iter;
 
-    /**
-     * Constructure
-     * 
-     * @param describe one column describe
-     * @param name     one column names
-     */
     public RowColumn(final String describe, final String name) {
         this.describe = describe;
         this.name = name;
@@ -59,12 +47,6 @@ public final class RowColumn implements Serializable
         return iter;
     }
 
-    /**
-     * @apiNote : addTagValue
-     * 
-     * @param tag   : column key
-     * @param value : column value
-     */
     public Pair<Long, Long> put(final String tag, Object value) {
         put(tag, value);
         return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
@@ -78,15 +60,15 @@ public final class RowColumn implements Serializable
         return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
     }
 
-    public Pair<Long, byte[]> ColdDataBlocking(byte[] timeDatas) {
-        return new Pair<>(date2Stamp(createdateTime()), 
-            new Block(getRowColumnName().getRight(), getCurrentTimestamp(), timeDatas).toBytes());
+    public Pair<Long, byte[]> ColdDataBlocking(String timeData) {
+        return new Pair<>(date2Stamp(createdateTime()), new Block(timeData).toBytes());
     }
 
     public Pair<Long, Block> hotBlockingData(byte[] hotdata) {
         return new Pair<>(date2Stamp(createdateTime()), Block.fromBytes(hotdata));
     }
 
+    @Deprecated
     public Pair<Long, Void> flushData() {
         return new Pair(date2Stamp(createdateTime()), Void.TYPE);
     }
@@ -101,7 +83,8 @@ public final class RowColumn implements Serializable
     }
 
     public Pair<Long, Boolean> Replace(final String tag, Object oldValue, Object newValue) {
-        return new Pair<>(date2Stamp(createdateTime()), tags.replace(tag, oldValue, newValue));
+        return new Pair<>(date2Stamp(createdateTime()),
+                tags.replace(tag, oldValue, newValue));
     }
 
     public Pair<Long, Set<Object>> KeySet() {
@@ -164,16 +147,11 @@ public final class RowColumn implements Serializable
 
     public final long getRowColumnID() { return id; }
 
-    /**
-     * TimeStamp Function(s)
-     * 
-     * @return : times format strings
-     */
-    private static String createdateTime() {
+    public static String createdateTime() {
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").format(new Date());
     }
 
-    private static long date2Stamp(String strings) {
+    public static long date2Stamp(String strings) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").parse(strings).getTime() / 1000L;
         } catch (ParseException e) {
@@ -183,7 +161,7 @@ public final class RowColumn implements Serializable
         return 0;
 	}
 
-	private static String stamp2Date(long stamp) {
+    public static String stamp2Date(long stamp) {
 		Date date = new Date(stamp * 1000L);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
@@ -195,8 +173,8 @@ public final class RowColumn implements Serializable
         StringBuilder sb = new StringBuilder();
 
         while (iter.hasNext()) {
-            sb.append("DateTime=" + getFormatTimeStamp().getRight() + " Column=" + " describe=" + getRowColumnDescribe().getRight() + 
-                " name=" + getRowColumnName().getRight() +" Tag=" + iter.next().getKey() + " value=" + iter.next().getValue() + "\r\n");
+            sb.append("DateTime= " + getFormatTimeStamp().getRight() + " Column= " + getRowColumnName()  + " describe=" + getRowColumnDescribe().getRight() +
+                " name= " + getRowColumnName().getRight() +" Tag= " + iter.next().getKey() + " value= " + iter.next().getValue() + "\r\n");
         }
 
         return sb.toString();

@@ -1,7 +1,6 @@
 package org.NauhWuun.times;
 
 import org.NauhWuun.times.RowCols.RowColumn;
-import org.NauhWuun.times.Until.TimeStamp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,18 +12,17 @@ public class InternalAxis
     private RowColumn rowColumn;
     private long timestamp;
 
-    public InternalAxis(final String colName, RowColumn rowColumn) throws ParseException {
+    public InternalAxis(final String colName, final RowColumn rowColumn) {
         this.colName = colName;
         this.rowColumn = rowColumn;
-        this.rowColumn.getCreateTimestamp().getRight();
-        this.timestamp = TimeStamp.date2Stamp(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        this.timestamp = Long.parseLong(RowColumn.createdateTime());
     }
 
     public RowColumn getRowColumn() {
         return this.rowColumn;
     }
 
-    public String getcolName() {
+    public String getColName() {
         return this.colName;
     }
 
