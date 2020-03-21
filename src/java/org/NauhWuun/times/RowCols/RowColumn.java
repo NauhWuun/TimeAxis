@@ -151,7 +151,7 @@ public final class RowColumn
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").format(new Date());
     }
 
-    public static long date2Stamp(String strings) {
+    private static long date2Stamp(final String strings) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").parse(strings).getTime() / 1000L;
         } catch (ParseException e) {
@@ -161,7 +161,7 @@ public final class RowColumn
         return 0;
 	}
 
-    public static String stamp2Date(long stamp) {
+    private static String stamp2Date(final long stamp) {
 		Date date = new Date(stamp * 1000L);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
