@@ -39,7 +39,7 @@ public final class TimeAxis
         return this;
     }
 
-    public TimeAxis addTagValue(final String name, final String tag, Object value) {
+    public TimeAxis addTagValue(final String name, final String tag, final Object value) {
         maps.get(name).getRowColumn().put(tag, value);
         return this;
     }
