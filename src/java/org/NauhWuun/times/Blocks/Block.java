@@ -10,7 +10,7 @@ public class Block
     private static final long FNV_64_PRIME = 0x100000001b3L;
 
     private final byte[] hash;
-    private long timeStamp;
+    private final long timeStamp;
     private final String data;
     private final byte[] encoded;
 
