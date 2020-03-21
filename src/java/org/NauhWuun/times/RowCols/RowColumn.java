@@ -68,7 +68,6 @@ public final class RowColumn
         return new Pair<>(date2Stamp(createdateTime()), Block.fromBytes(hotdata));
     }
 
-    @Deprecated
     public Pair<Long, Void> flushData() {
         return new Pair(date2Stamp(createdateTime()), Void.TYPE);
     }
@@ -101,7 +100,7 @@ public final class RowColumn
 
     public Pair<Long, Long> Clear() {
     //    tags.clear();
-        return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
+        return new Pair<>(0L, 0L);
     }
 
     public Pair<Long, Long> PutAll(Map<? extends Object, ? extends Object> m) {
