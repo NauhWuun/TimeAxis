@@ -12,7 +12,7 @@ public class InternalAxis
     private RowColumn rowColumn;
     private long timestamp;
 
-    public InternalAxis(final String colName, final RowColumn rowColumn) {
+    public InternalAxis(final String colName, RowColumn rowColumn) {
         this.colName = colName;
         this.rowColumn = rowColumn;
         this.timestamp = Long.parseLong(RowColumn.createdateTime());
