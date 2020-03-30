@@ -60,6 +60,10 @@ public final class RowColumn
         return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
     }
 
+    public Pair<Long, Long> putAll(Map<? extends K, ? extends V> map) {
+        tags.putAll(map);
+    }
+
     public Pair<Long, byte[]> ColdDataBlocking(String timeData) {
         return new Pair<>(date2Stamp(createdateTime()), new Block(timeData).toBytes());
     }
