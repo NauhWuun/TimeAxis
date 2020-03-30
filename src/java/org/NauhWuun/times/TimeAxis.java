@@ -20,10 +20,12 @@ public final class TimeAxis
     private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
     private static Map<String, InternalAxis> maps, cacheMap;
 
+    private static final int WINDOW_WHEEL = 15;
+
     public TimeAxis() {
         maps = new HashMap<>();
         cacheMap = new ConcurrentHashMap<>();
-        freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, 5, TimeUnit.SECONDS);
+        freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, WINDOW_WHEEL, TimeUnit.SECONDS);
     }
 
     public TimeAxis Builder() {
@@ -42,6 +44,10 @@ public final class TimeAxis
     public TimeAxis addTagValue(final String name, final String tag, final Object value) {
         maps.get(name).getRowColumn().put(tag, value);
         return this;
+    }
+
+    public TimeAxis addTagValues(final String name, Map<? extends K, ? extends V> map) {
+        maps.get(name).getRowColumn().putAll(map);
     }
 
     public static HashMap<String, InternalAxis> InvertedMap(Map<String, InternalAxis> invertTheMap) {
