@@ -18,17 +18,23 @@ import java.util.concurrent.TimeUnit;
 public final class TimeAxis
 {
     private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
+
     private static Map<String, InternalAxis> maps, cacheMap;
 
     private static final int WINDOW_WHEEL = 15;
+    private static final int EXPIRED_TIMES = 24;
+
+    private static Boolean expiredStatus = false;
 
     public TimeAxis() {
         maps = new HashMap<>();
         cacheMap = new ConcurrentHashMap<>();
-        freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, WINDOW_WHEEL, TimeUnit.SECONDS);
     }
 
     public TimeAxis Builder() {
+        freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, WINDOW_WHEEL, TimeUnit.SECONDS);
+        freezing.scheduleAtFixedRate(TimeAxis::autoExpired, 0, EXPIRED_TIMES, TimeUnit.HOURS);
+
         return this;
     }
 
@@ -50,11 +56,12 @@ public final class TimeAxis
         maps.get(name).getRowColumn().putAll(map);
     }
 
-    public static HashMap<String, InternalAxis> InvertedMap(Map<String, InternalAxis> invertTheMap) {
-		Set<Entry<String, InternalAxis>> set = invertTheMap.entrySet();
+    public static HashMap<String, InternalAxis> InvertedMap() {
+		Set<Entry<String, InternalAxis>> set = maps.entrySet();
 		ArrayList<Entry<String, InternalAxis>> arrayList = new ArrayList<>(set);
  
-		arrayList.sort((arg0, arg1) -> (arg1.getValue().getRowColumn().getCurrentTimestamp())
+        arrayList.sort((arg0, arg1) -> 
+            (arg1.getValue().getRowColumn().getCurrentTimestamp())
                 .compareTo(arg0.getValue().getRowColumn().getCurrentTimestamp()));
 		
 		LinkedHashMap<String, InternalAxis> map = new LinkedHashMap<>();
@@ -87,7 +94,7 @@ public final class TimeAxis
         }
 
         Block timeBlock = new Block(sb.toString());
-        Path newFilePath = Paths.get(String.valueOf(Objects.requireNonNull(timeBlock).getTimeStamp()));
+        Path newFilePath = Paths.get("." + "/TimeBlocks/" + String.valueOf(Objects.requireNonNull(timeBlock).getTimeStamp()));
 
         try {
             Files.createFile(newFilePath);
@@ -97,6 +104,10 @@ public final class TimeAxis
         } catch (IOException e) {
             e.getSuppressed();
         }
+    }
+
+    private static void autoExpired() {
+        expiredStatus = true;
     }
 
     @Override
