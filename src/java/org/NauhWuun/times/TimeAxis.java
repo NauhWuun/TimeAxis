@@ -18,31 +18,25 @@ import java.util.concurrent.TimeUnit;
 public final class TimeAxis
 {
     private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
+    private static final int cacheSize =  1024 * 1024 * 5 * 1;
 
-    private static Map<String, InternalAxis> maps, cacheMap;
+    private static Map<String, InternalAxis> maps = new LinkHashMap<String, Internal>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Internal> eldest) {
+            return size() > cacheSize;
+        }
+    };
 
-    private static final int WINDOW_WHEEL = 15;
-    private static final int EXPIRED_TIMES = 24;
-
-    private static Boolean expiredStatus = false;
+    private static final int WINDOW_WHEEL = 60;
 
     public TimeAxis() {
-        maps = new HashMap<>();
-        cacheMap = new ConcurrentHashMap<>();
-    }
-
-    public TimeAxis Builder() {
         freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, WINDOW_WHEEL, TimeUnit.SECONDS);
-        freezing.scheduleAtFixedRate(TimeAxis::autoExpired, 0, EXPIRED_TIMES, TimeUnit.HOURS);
-
-        return this;
     }
 
     public TimeAxis createRowColumn(final String describe, final String name) {
         RowColumn rc = new RowColumn(describe, name);
         InternalAxis ia = new InternalAxis(name, rc);
 
-        cacheMap.put(name, ia);
         maps.put(name, ia);
         return this;
     }
@@ -64,7 +58,8 @@ public final class TimeAxis
             (arg1.getValue().getRowColumn().getCurrentTimestamp())
                 .compareTo(arg0.getValue().getRowColumn().getCurrentTimestamp()));
 		
-		LinkedHashMap<String, InternalAxis> map = new LinkedHashMap<>();
+        LinkedHashMap<String, InternalAxis> map = new LinkedHashMap<>();
+        
         for (Entry<String, InternalAxis> entry : arrayList) {
             map.put(entry.getKey(), entry.getValue());
         }
@@ -74,11 +69,11 @@ public final class TimeAxis
 
     public void shutDown() {
         System.out.println("ShutDown Freezing... \r\n");
+
         freezing.shutdownNow();
 
         try {
             autoFreezing();
-
             Thread.sleep(0);
         } catch (InterruptedException e) {
             e.notify();
@@ -86,12 +81,10 @@ public final class TimeAxis
     }
 
     private static void autoFreezing() {
-        StringBuilder sb = new StringBuilder();
-        cacheMap.entrySet().parallelStream().forEach(entry -> sb.append(entry.getValue().getRowColumn().toString()));
+        if (maps.isEmpty()) return;
 
-        if (sb.length() < 0) {
-            return;
-        }
+        StringBuilder sb = new StringBuilder();
+        maps.entrySet().parallelStream().forEach(entry -> sb.append(entry.getValue().getRowColumn().toString()));
 
         Block timeBlock = new Block(sb.toString());
         Path newFilePath = Paths.get("." + "/TimeBlocks/" + String.valueOf(Objects.requireNonNull(timeBlock).getTimeStamp()));
@@ -99,15 +92,10 @@ public final class TimeAxis
         try {
             Files.createFile(newFilePath);
             Files.write(newFilePath, timeBlock.toBytes(), StandardOpenOption.APPEND);
-
-            cacheMap.clear();
+            maps.clear();
         } catch (IOException e) {
             e.getSuppressed();
         }
-    }
-
-    private static void autoExpired() {
-        expiredStatus = true;
     }
 
     @Override
