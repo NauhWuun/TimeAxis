@@ -20,8 +20,8 @@ import java.text.SimpleDateFormat;
 public final class RowColumn
 {
     private final String describe, name;
-    private long initTimeStamp;
-    private long id;
+    private final long initTimeStamp;
+    private final long id;
 
     private SortedMap<Object, Object> tags;
     private Set<Map.Entry<Object, Object>> sortEntry;
@@ -58,10 +58,6 @@ public final class RowColumn
         }
         
         return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
-    }
-
-    public Pair<Long, Long> putAll(Map<? extends K, ? extends V> map) {
-        tags.putAll(map);
     }
 
     public Pair<Long, byte[]> ColdDataBlocking(String timeData) {
