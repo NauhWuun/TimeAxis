@@ -17,7 +17,7 @@ import java.util.TimeZone;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public final class RowColumn
+public final class RowColumn implements Serializable
 {
     private final String describe, name;
     private final long initTimeStamp;
@@ -33,8 +33,7 @@ public final class RowColumn
         this.initTimeStamp = date2Stamp(createdateTime());
         this.id = RockRand.getUnsignedLong();
 
-        tags = new TreeMap<Object, Object>();
-
+        tags = new TreeMap<>();
         sortEntry = tags.entrySet();
         iter = sortEntry.iterator();
     }
@@ -47,12 +46,12 @@ public final class RowColumn
         return iter;
     }
 
-    public Pair<Long, Long> put(final String tag, Object value) {
-        put(tag, value);
+    public Pair<Long, Long> Put(final String tag, Object value) {
+        Put(tag, value);
         return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
     }
 
-    public Pair<Long, Long> put(final String tag, Object... values) {
+    public Pair<Long, Long> Put(final String tag, Object... values) {
         for (Object v : values) {
             tags.put(tag, v);
         }
@@ -60,7 +59,7 @@ public final class RowColumn
         return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
     }
 
-    public Pair<Long, byte[]> ColdDataBlocking(String timeData) {
+    public Pair<Long, byte[]> ColdDataBlocking(byte[] timeData) {
         return new Pair<>(date2Stamp(createdateTime()), new Block(timeData).toBytes());
     }
 
@@ -94,6 +93,10 @@ public final class RowColumn
        return new Pair<>(date2Stamp(createdateTime()), tags.values());
     }
 
+    public Pair<Long, Iterator<Map.Entry<Object, Object>>> getIterator() {
+        return new Pair<>(date2Stamp(createdateTime()), iter);
+    }
+
     public Pair<Long, Object> getTag(String tag) {
         return new Pair<>(date2Stamp(createdateTime()), tags.get(tag));
     }
@@ -125,7 +128,7 @@ public final class RowColumn
     }
 
     public Pair<Long, String> getRowColumnDescribe() {
-        return new Pair<>(date2Stamp(createdateTime()), describe);
+        return new Pair<>(initTimeStamp, describe);
     }
 
     public Pair<Long, String> getRowColumnName() {
@@ -144,7 +147,7 @@ public final class RowColumn
         return date2Stamp(createdateTime());
     }
 
-    public final long getRowColumnID() { return id; }
+    public final Long getRowColumnID() { return id; }
 
     public static String createdateTime() {
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").format(new Date());
@@ -165,6 +168,20 @@ public final class RowColumn
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
 		return sdf.format(date);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (! (o instanceof RowColumn)) return false;
+
+        RowColumn rc = (RowColumn) o;
+        return id == rc.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) id;
     }
     
     @Override
