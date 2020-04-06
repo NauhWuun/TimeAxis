@@ -11,26 +11,26 @@ public class Block
 
     private final byte[] hash;
     private final long timeStamp;
-    private final String data;
+    private final byte[] data;
     private final byte[] encoded;
 
-    public Block(String data) {
+    public Block(final byte[] data) {
         this.data = data;
         this.timeStamp = Long.parseLong(RowColumn.createdateTime());
 
         Encoder enc = new Encoder();
         enc.writeLong(timeStamp);
-        enc.writeString(data);
+        enc.writeBytes(data);
         this.encoded = enc.toBytes();
         this.hash = FNV1A_64_HASH(new String(encoded)).getBytes();
     }
 
-    public Block(byte[] hash, byte[] encoded) {
+    public Block(final byte[] hash, final byte[] encoded) {
         this.hash = hash;
 
         Decoder dec = new Decoder(encoded);
         this.timeStamp = dec.readLong();
-        this.data = dec.readString();
+        this.data = dec.readBytes();
 
         this.encoded = encoded;
     }
@@ -38,7 +38,7 @@ public class Block
     public byte[] getHash() {
         return hash;
     }
-    public String getData() {
+    public byte[] getData() {
         return data;
     }
     public Long getTimeStamp() { return timeStamp; }
@@ -58,7 +58,7 @@ public class Block
         return new Block(hash, encoded);
     }
 
-    public static final String FNV1A_64_HASH(final String k) {
+    public static String FNV1A_64_HASH(final String k) {
         long rv = FNV_64_INIT;
         int len = k.length();
 
@@ -72,6 +72,6 @@ public class Block
 
     @Override
     public String toString() {
-        return "Block [TimeStamp= " + getTimeStamp() + "\t data= " +  (new String(data).toString()) + "\t hash= " + (new String(hash).toString()) + "]";
+        return "Block [TimeStamp= " + getTimeStamp() + "\t data= " + data + "\t hash= " + hash + "]";
     }
 }

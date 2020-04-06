@@ -2,20 +2,16 @@ package org.NauhWuun.times;
 
 import org.NauhWuun.times.RowCols.RowColumn;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.Serializable;
 
-public class InternalAxis
+public class InternalAxis implements Serializable
 {
-    private String colName;
-    private RowColumn rowColumn;
-    private long timestamp;
+    private final String colName;
+    private final RowColumn rowColumn;
 
-    public InternalAxis(final String colName, RowColumn rowColumn) {
+    public InternalAxis(final String colName, final RowColumn rowColumn) {
         this.colName = colName;
         this.rowColumn = rowColumn;
-        this.timestamp = Long.parseLong(RowColumn.createdateTime());
     }
 
     public RowColumn getRowColumn() {
@@ -24,9 +20,5 @@ public class InternalAxis
 
     public String getColName() {
         return this.colName;
-    }
-
-    public long getTimestamp() {
-        return this.timestamp;
     }
 }
