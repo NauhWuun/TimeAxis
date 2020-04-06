@@ -42,7 +42,7 @@ public final class TimeAxis implements AutoCloseable
     public TimeAxis addTagValues(final String name, Map<?, ?> map) {
         maps.get(name).getRowColumn().PutAll(map);
         return this;
-    }
+    } 
 
     public static Map<String, Object> loadingCSVData(final String fileName) {
         Map<String, Object> customerMap = null;
@@ -81,7 +81,7 @@ public final class TimeAxis implements AutoCloseable
         } catch (IOException e) {
             e.printStackTrace();
         }
-    } 
+    }
 
     public static HashMap<String, InternalAxis> InvertedMap() {
 		Set<Entry<String, InternalAxis>> set = maps.entrySet();
