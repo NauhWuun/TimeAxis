@@ -81,7 +81,7 @@ public final class TimeAxis implements AutoCloseable
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    } 
 
     public static HashMap<String, InternalAxis> InvertedMap() {
 		Set<Entry<String, InternalAxis>> set = maps.entrySet();
