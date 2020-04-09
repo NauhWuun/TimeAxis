@@ -30,43 +30,29 @@
     </properties>
 
     <dependencies>
+
         <dependency>
-            <groupId>org.jnosql.diana</groupId>
-            <artifactId>diana-document</artifactId>
-            <version>0.0.5</version>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-solrj</artifactId>
+            <version>8.5.0</version>
         </dependency>
 
         <dependency>
-            <groupId>org.jnosql.diana</groupId>
-            <artifactId>diana-key-value</artifactId>
-            <version>0.0.5</version>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-commons-csv</artifactId>
+            <version>3.5.0</version>
         </dependency>
 
         <dependency>
-            <groupId>org.jnosql.diana</groupId>
-            <artifactId>diana-column</artifactId>
-            <version>0.0.5</version>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-analysis-extras</artifactId>
+            <version>8.5.0</version>
         </dependency>
 
-        <!-- super-csv -->
         <dependency>
-            <groupId>net.sf.supercsv</groupId>
-            <artifactId>super-csv</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-
-        <!-- rocksdbjni -->
-        <dependency>
-            <groupId>org.rocksdb</groupId>
-            <artifactId>rocksdbjni</artifactId>
-            <version>6.7.3</version>
-        </dependency>
-
-        <!-- RoaringBitmap -->
-        <dependency>
-            <groupId>org.roaringbitmap</groupId>
-            <artifactId>RoaringBitmap</artifactId>
-            <version>0.8.13</version>
+            <groupId>org.apache.solr</groupId>
+            <artifactId>solr-clustering</artifactId>
+            <version>8.5.0</version>
         </dependency>
 
     </dependencies>
