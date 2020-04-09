@@ -1,17 +1,7 @@
 package org.NauhWuun.times;
 
 import org.NauhWuun.times.RowCols.RowColumn;
-import org.supercsv.cellprocessor.ParseDate;
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvMapReader;
-import org.supercsv.io.CsvMapWriter;
-import org.supercsv.io.ICsvMapReader;
-import org.supercsv.io.ICsvMapWriter;
-import org.supercsv.prefs.CsvPreference;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
@@ -42,45 +32,14 @@ public final class TimeAxis implements AutoCloseable
     public TimeAxis addTagValues(final String name, Map<?, ?> map) {
         maps.get(name).getRowColumn().PutAll(map);
         return this;
-    } 
+    }
 
     public static Map<String, Object> loadingCSVData(final String fileName) {
-        Map<String, Object> customerMap = null;
 
-        try (ICsvMapReader mapReader = new CsvMapReader(new FileReader(fileName), CsvPreference.EXCEL_PREFERENCE)) {
-            final String[] header = mapReader.getHeader(true);
-            customerMap = mapReader.read(header, new CellProcessor[] {
-                    null,
-                    null,
-                    new ParseDate("yyyy-MM-dd HH:mm:ss z"),
-                    null,
-                    null
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return customerMap;
     }
 
     public static void saveCSVData(final String fileName) {
-        try (ICsvMapWriter writer = new CsvMapWriter(new FileWriter(fileName), CsvPreference.EXCEL_PREFERENCE)) {
-            final String[] header = new String[] { "Name", "Id", "initTimeStamp", "Key", "Value" };
-            final HashMap<String, Object> csvMap = new HashMap<>();
 
-            for (Entry<String, InternalAxis> entry : maps.entrySet()) {
-                csvMap.put(header[0], entry.getValue().getColName());
-                csvMap.put(header[1], entry.getValue().getRowColumn().getRowColumnID());
-                csvMap.put(header[2], entry.getValue().getRowColumn().getCurrentTimestamp());
-                csvMap.put(header[3], entry.getValue().getRowColumn().getIterator().getRight().next().getKey());
-                csvMap.put(header[4], entry.getValue().getRowColumn().getIterator().getRight().next().getValue());
-            }
-
-            writer.writeHeader(header);
-            writer.write(csvMap, header);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static HashMap<String, InternalAxis> InvertedMap() {
