@@ -4,6 +4,8 @@ import org.NauhWuun.times.Codec.Decoder;
 import org.NauhWuun.times.Codec.Encoder;
 import org.NauhWuun.times.RowCols.RowColumn;
 
+import java.util.Arrays;
+
 public class Block
 {
     private static final long FNV_64_INIT  = 0xcbf29ce484222325L;
@@ -31,7 +33,6 @@ public class Block
         Decoder dec = new Decoder(encoded);
         this.timeStamp = dec.readLong();
         this.data = dec.readBytes();
-
         this.encoded = encoded;
     }
 
@@ -72,6 +73,6 @@ public class Block
 
     @Override
     public String toString() {
-        return "Block [TimeStamp= " + getTimeStamp() + "\t data= " + data + "\t hash= " + hash + "]";
+        return "Block [TimeStamp= " + getTimeStamp() + "\t data= " + Arrays.toString(data) + "\t hash= " + Arrays.toString(hash) + "]";
     }
 }

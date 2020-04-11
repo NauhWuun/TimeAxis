@@ -31,28 +31,18 @@
 
     <dependencies>
 
+        <!-- rocksdbjni -->
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-solrj</artifactId>
-            <version>8.5.0</version>
+            <groupId>org.rocksdb</groupId>
+            <artifactId>rocksdbjni</artifactId>
+            <version>6.7.3</version>
         </dependency>
 
+        <!-- commons-csv -->
         <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-commons-csv</artifactId>
-            <version>3.5.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-analysis-extras</artifactId>
-            <version>8.5.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.solr</groupId>
-            <artifactId>solr-clustering</artifactId>
-            <version>8.5.0</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.8</version>
         </dependency>
 
     </dependencies>

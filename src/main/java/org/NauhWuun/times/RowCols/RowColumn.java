@@ -1,6 +1,5 @@
 package org.NauhWuun.times.RowCols;
 
-import org.NauhWuun.times.Blocks.Block;
 import org.NauhWuun.times.Until.Pair;
 import org.NauhWuun.times.Until.RockRand;
 
@@ -46,10 +45,7 @@ public final class RowColumn implements Serializable
         return iter;
     }
 
-    public Pair<Long, Long> Put(final String tag, Object value) {
-        Put(tag, value);
-        return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
-    }
+    public void Put(final String tag, Object value) { Put(tag, value); }
 
     public Pair<Long, Long> Put(final String tag, Object... values) {
         for (Object v : values) {
@@ -57,18 +53,6 @@ public final class RowColumn implements Serializable
         }
         
         return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
-    }
-
-    public Pair<Long, byte[]> ColdDataBlocking(byte[] timeData) {
-        return new Pair<>(date2Stamp(createdateTime()), new Block(timeData).toBytes());
-    }
-
-    public Pair<Long, Block> hotBlockingData(byte[] hotdata) {
-        return new Pair<>(date2Stamp(createdateTime()), Block.fromBytes(hotdata));
-    }
-
-    public Pair<Long, Void> flushData() {
-        return new Pair(date2Stamp(createdateTime()), Void.TYPE);
     }
 
     public Pair<Long, Long> remove(final String tag) {
@@ -101,15 +85,9 @@ public final class RowColumn implements Serializable
         return new Pair<>(date2Stamp(createdateTime()), tags.get(tag));
     }
 
-    public Pair<Long, Long> Clear() {
-    //    tags.clear();
-        return new Pair<>(0L, 0L);
-    }
+    public Pair<Long, Long> Clear() { return new Pair<>(0L, 0L); }
 
-    public Pair<Long, Long> PutAll(Map<? extends Object, ? extends Object> m) {
-        tags.putAll(m);
-        return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
-    }
+    public void PutAll(Map<?, ?> m) { tags.putAll(m); }
 
     public Pair<Long, Object> FirstKey() {
         return new Pair<>(date2Stamp(createdateTime()), tags.get(iter.next()));
@@ -183,16 +161,17 @@ public final class RowColumn implements Serializable
     public int hashCode() {
         return (int) id;
     }
-    
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
 
+    public void toStrings() {
         while (iter.hasNext()) {
-            sb.append("DateTime= " + getFormatTimeStamp().getRight() + " Column= " + getRowColumnName()  + " describe=" + getRowColumnDescribe().getRight() +
-                " name= " + getRowColumnName().getRight() +" Tag= " + iter.next().getKey() + " value= " + iter.next().getValue() + "\r\n");
+            System.out.println(
+                    "DateTime= " + getFormatTimeStamp().getRight() +
+                    " Column= " + getRowColumnName()  +
+                    " describe=" + getRowColumnDescribe().getRight() +
+                    " name= " + getRowColumnName().getRight() +
+                    " Tag= " + iter.next().getKey() +
+                    " value= " + iter.next().getValue() + "\r\n"
+            );
         }
-
-        return sb.toString();
     }
 }

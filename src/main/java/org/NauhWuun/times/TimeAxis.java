@@ -1,7 +1,20 @@
 package org.NauhWuun.times;
 
+import org.NauhWuun.times.Blocks.Block;
 import org.NauhWuun.times.RowCols.RowColumn;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileAttribute;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
@@ -34,12 +47,28 @@ public final class TimeAxis implements AutoCloseable
         return this;
     }
 
-    public static Map<String, Object> loadingCSVData(final String fileName) {
+    public static List<CSVRecord> csvReader(final String csvFile, final String[] fileHeader, boolean skipHeader) throws IOException{
+        CSVFormat format;
 
+        if (skipHeader) {
+            format = CSVFormat.DEFAULT.withHeader(fileHeader).withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim();
+        } else {
+            format = CSVFormat.DEFAULT.withHeader(fileHeader).withIgnoreHeaderCase().withTrim();
+        }
+
+        Reader reader = Files.newBufferedReader(Paths.get(csvFile));
+        CSVParser csvParser = new CSVParser(reader, format);
+        return csvParser.getRecords();
     }
 
-    public static void saveCSVData(final String fileName) {
+    public static void csvWriter(final String csvFile, final String[] fileHeader, List<String[]> content) throws IOException {
+        BufferedWriter writer = Files.newBufferedWriter(Paths.get(csvFile));
+        CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(fileHeader));
 
+        for (String[] c : content) {
+            csvPrinter.printRecord(Arrays.asList(c));
+        }
+        csvPrinter.flush();
     }
 
     public static HashMap<String, InternalAxis> InvertedMap() {
@@ -62,11 +91,18 @@ public final class TimeAxis implements AutoCloseable
     private static void autoFreezing() {
         if (maps.isEmpty()) return;
 
-//        StringBuilder sb = new StringBuilder();
-//        maps.entrySet().parallelStream().forEach(entry -> sb.append(entry.getValue().getRowColumn().toString()));
-//
-//        Block timeBlock = new Block(sb.toString());
+        StringBuilder sb = new StringBuilder();
+        maps.entrySet().parallelStream().forEach(entry -> {
+            sb.append(entry.getValue().getRowColumn().getRowColumnID());
+            sb.append(entry.getValue().getRowColumn().getCreateTimestamp());
+            sb.append(entry.getValue().getRowColumn().getRowColumnDescribe());
+            sb.append(entry.getValue().getRowColumn().getRowColumnName());
+            sb.append(entry.getValue().getRowColumn().Size());
+            sb.append(entry.getValue().getRowColumn().getIterator().getRight().next().getKey());
+            sb.append(entry.getValue().getRowColumn().getIterator().getRight().next().getValue());
+        });
 
+        Block timeBlock = new Block(sb.toString().getBytes());
 //        Path newFilePath = Paths.get("." + "/TimeBlocks/" + Objects.requireNonNull(timeBlock).getTimeStamp());
 //
 //        try {
