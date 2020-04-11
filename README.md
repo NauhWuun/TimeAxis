@@ -1,2 +1,2 @@
-# TimesAxis
+# Time-Axis
 Time Series DataBase
