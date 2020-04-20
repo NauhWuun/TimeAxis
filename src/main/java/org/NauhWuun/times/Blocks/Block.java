@@ -2,7 +2,7 @@ package org.NauhWuun.times.Blocks;
 
 import org.NauhWuun.times.Codec.Decoder;
 import org.NauhWuun.times.Codec.Encoder;
-import org.NauhWuun.times.RowCols.RowColumn;
+import org.NauhWuun.times.RowCols.Rows;
 
 import java.util.Arrays;
 
@@ -12,16 +12,16 @@ public class Block
     private static final long FNV_64_PRIME = 0x100000001b3L;
 
     private final byte[] hash;
-    private final long timeStamp;
+    private final String timeStamp;
     private final byte[] data;
     private final byte[] encoded;
 
     public Block(final byte[] data) {
         this.data = data;
-        this.timeStamp = Long.parseLong(RowColumn.createdateTime());
+        this.timeStamp = Rows.createdateTime();
 
         Encoder enc = new Encoder();
-        enc.writeLong(timeStamp);
+        enc.writeString(timeStamp);
         enc.writeBytes(data);
         this.encoded = enc.toBytes();
         this.hash = FNV1A_64_HASH(new String(encoded)).getBytes();
@@ -31,7 +31,7 @@ public class Block
         this.hash = hash;
 
         Decoder dec = new Decoder(encoded);
-        this.timeStamp = dec.readLong();
+        this.timeStamp = dec.readString();
         this.data = dec.readBytes();
         this.encoded = encoded;
     }
@@ -42,7 +42,7 @@ public class Block
     public byte[] getData() {
         return data;
     }
-    public Long getTimeStamp() { return timeStamp; }
+    public String getTimeStamp() { return timeStamp; }
 
     public byte[] toBytes() {
         Encoder enc = new Encoder();

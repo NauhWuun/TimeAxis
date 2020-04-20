@@ -3,9 +3,7 @@ package org.NauhWuun.times.RowCols;
 import org.NauhWuun.times.Until.Pair;
 import org.NauhWuun.times.Until.RockRand;
 
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -16,43 +14,26 @@ import java.util.TimeZone;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public final class RowColumn implements Serializable
+public final class Rows
 {
-    private final String describe, name;
-    private final long initTimeStamp;
     private final long id;
+    private final long initTimeStamp;
 
-    private SortedMap<Object, Object> tags;
-    private Set<Map.Entry<Object, Object>> sortEntry;
-    private Iterator<Map.Entry<Object, Object>> iter;
+    private final SortedMap<Object, Object> tags;
 
-    public RowColumn(final String describe, final String name) {
-        this.describe = describe;
-        this.name = name;
+    public Rows() {
         this.initTimeStamp = date2Stamp(createdateTime());
         this.id = RockRand.getUnsignedLong();
 
         tags = new TreeMap<>();
-        sortEntry = tags.entrySet();
-        iter = sortEntry.iterator();
     }
 
     public Pair<Long, Boolean> containsTag(Object tag) {
         return new Pair<>(date2Stamp(createdateTime()), tags.containsKey(tag));
     }
 
-    public Iterator<Map.Entry<Object, Object>> getColumnIterator() {
-        return iter;
-    }
-
-    public void Put(final String tag, Object value) { Put(tag, value); }
-
-    public Pair<Long, Long> Put(final String tag, Object... values) {
-        for (Object v : values) {
-            tags.put(tag, v);
-        }
-        
-        return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
+    public void Put(final String tag, Object value) {
+        tags.put(tag, value);
     }
 
     public Pair<Long, Long> remove(final String tag) {
@@ -65,8 +46,7 @@ public final class RowColumn implements Serializable
     }
 
     public Pair<Long, Boolean> Replace(final String tag, Object oldValue, Object newValue) {
-        return new Pair<>(date2Stamp(createdateTime()),
-                tags.replace(tag, oldValue, newValue));
+        return new Pair<>(date2Stamp(createdateTime()), tags.replace(tag, oldValue, newValue));
     }
 
     public Pair<Long, Set<Object>> KeySet() {
@@ -75,10 +55,6 @@ public final class RowColumn implements Serializable
 
     public Pair<Long, Collection<Object>> Values() {
        return new Pair<>(date2Stamp(createdateTime()), tags.values());
-    }
-
-    public Pair<Long, Iterator<Map.Entry<Object, Object>>> getIterator() {
-        return new Pair<>(date2Stamp(createdateTime()), iter);
     }
 
     public Pair<Long, Object> getTag(String tag) {
@@ -90,7 +66,7 @@ public final class RowColumn implements Serializable
     public void PutAll(Map<?, ?> m) { tags.putAll(m); }
 
     public Pair<Long, Object> FirstKey() {
-        return new Pair<>(date2Stamp(createdateTime()), tags.get(iter.next()));
+        return new Pair<>(date2Stamp(createdateTime()), tags.firstKey());
     }
 
     public Pair<Long, Object> LastKey() {        
@@ -103,14 +79,6 @@ public final class RowColumn implements Serializable
 
     public Pair<Long, Integer> Size() {
         return new Pair<>(date2Stamp(createdateTime()), tags.size());
-    }
-
-    public Pair<Long, String> getRowColumnDescribe() {
-        return new Pair<>(initTimeStamp, describe);
-    }
-
-    public Pair<Long, String> getRowColumnName() {
-        return new Pair<>(date2Stamp(createdateTime()), name);
     }
 
     public Pair<Long, Long> getCreateTimestamp() {
@@ -131,7 +99,21 @@ public final class RowColumn implements Serializable
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").format(new Date());
     }
 
-    private static long date2Stamp(final String strings) {
+    /**
+     *
+     * @param strings           timeStamp Character
+     * @param dateType          yyyy-MM-dd'T'HH:mm:ss z
+     * @return                  user defined type
+     * @throws ParseException
+     */
+    public static String getTimeStampSubType(String strings, String dateType) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z");
+        Date date = format.parse(strings);
+        SimpleDateFormat df = new SimpleDateFormat(dateType);
+        return df.format(date);
+    }
+
+    private long date2Stamp(final String strings) {
         try {
             return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").parse(strings).getTime() / 1000L;
         } catch (ParseException e) {
@@ -141,7 +123,7 @@ public final class RowColumn implements Serializable
         return 0;
 	}
 
-    private static String stamp2Date(final long stamp) {
+    private String stamp2Date(final long stamp) {
 		Date date = new Date(stamp * 1000L);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT-4"));
@@ -151,27 +133,14 @@ public final class RowColumn implements Serializable
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof RowColumn)) return false;
+        if (! (o instanceof Rows)) return false;
 
-        RowColumn rc = (RowColumn) o;
+        Rows rc = (Rows) o;
         return id == rc.id;
     }
 
     @Override
     public int hashCode() {
         return (int) id;
-    }
-
-    public void toStrings() {
-        while (iter.hasNext()) {
-            System.out.println(
-                    "DateTime= " + getFormatTimeStamp().getRight() +
-                    " Column= " + getRowColumnName()  +
-                    " describe=" + getRowColumnDescribe().getRight() +
-                    " name= " + getRowColumnName().getRight() +
-                    " Tag= " + iter.next().getKey() +
-                    " value= " + iter.next().getValue() + "\r\n"
-            );
-        }
     }
 }
