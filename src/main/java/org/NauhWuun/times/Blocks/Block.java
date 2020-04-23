@@ -2,7 +2,7 @@ package org.NauhWuun.times.Blocks;
 
 import org.NauhWuun.times.Codec.Decoder;
 import org.NauhWuun.times.Codec.Encoder;
-import org.NauhWuun.times.RowCols.Rows;
+import org.NauhWuun.times.RowCol;
 
 import java.util.Arrays;
 
@@ -18,7 +18,7 @@ public class Block
 
     public Block(final byte[] data) {
         this.data = data;
-        this.timeStamp = Rows.createdateTime();
+        this.timeStamp = RowCol.createdateTime();
 
         Encoder enc = new Encoder();
         enc.writeString(timeStamp);

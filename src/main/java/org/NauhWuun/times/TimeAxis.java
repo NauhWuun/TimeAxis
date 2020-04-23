@@ -3,8 +3,6 @@ package org.NauhWuun.times;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.NauhWuun.times.Blocks.Block;
-import org.NauhWuun.times.RowCols.Column;
-import org.NauhWuun.times.RowCols.Rows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -21,11 +19,11 @@ import java.util.concurrent.*;
 public final class TimeAxis implements AutoCloseable
 {
     private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
-    private static final Cache<String, Column> maps = Caffeine.newBuilder()
+    private static final Cache<String, RowCol> maps = Caffeine.newBuilder()
             .maximumSize(1024 * 1024 * 500)
             .build();
 
-    private static final int WINDOW_WHEEL = 5;
+    private static final int WINDOW_WHEEL = 30;
     private static final String dbName = "TimeAxisDataBase";
     private static RocksDB rocksDB;
     private static RocksIterator iter;
@@ -55,12 +53,8 @@ public final class TimeAxis implements AutoCloseable
         freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, WINDOW_WHEEL, TimeUnit.SECONDS);
     }
 
-    public void createColumnFamily(final Column Column) {
-        maps.put(Column. Column);
-    }
-
     public void addValue(final String name, final String tag, final Object value) {
-        Objects.requireNonNull(maps.getIfPresent(name)).getRows().Put(tag, value);
+        Objects.requireNonNull(maps.getIfPresent(name)).Put(tag, value);
     }
 
     public static List<CSVRecord> csvReader(final String csvFile, final String[] fileHeader, boolean skipHeader) throws IOException {
@@ -73,15 +67,15 @@ public final class TimeAxis implements AutoCloseable
         new CSVPrinter(Files.newBufferedWriter(Paths.get(csvFile)), CSVFormat.DEFAULT.withHeader(fileHeader)).flush();
     }
 
-    protected static HashMap<String, Column> InvertedMap() {
-		Set<Entry<String, Column>> set = maps.asMap().entrySet();
-		ArrayList<Entry<String, Column>> arrayList = new ArrayList<>(set);
+    protected static HashMap<String, RowCol> InvertedMap() {
+		Set<Entry<String, RowCol>> set = maps.asMap().entrySet();
+		ArrayList<Entry<String, RowCol>> arrayList = new ArrayList<>(set);
 
         arrayList.sort((arg0, arg1) ->
-            (arg1.getValue().getRows().getCurrentTimestamp())
-                .compareTo(arg0.getValue().getRows().getCurrentTimestamp()));
+            (arg1.getValue().getCurrentTimestamp())
+                .compareTo(arg0.getValue().getCurrentTimestamp()));
 
-        LinkedHashMap<String, Column> map = new LinkedHashMap<>();
+        LinkedHashMap<String, RowCol> map = new LinkedHashMap<>();
         arrayList.forEach(k -> map.put(k.getKey(), k.getValue()));
 		return map;
     }
@@ -90,29 +84,21 @@ public final class TimeAxis implements AutoCloseable
         if (maps.asMap().isEmpty()) return;
 
         StringBuilder sb = new StringBuilder();
-        HashMap<String, Column> map = InvertedMap();
-        Collection<Column> set = map.values();
+        maps.asMap().forEach((k, v) -> {
+            sb.append(k);
+            sb.append(v.getRowColumnID());
+            sb.append(v.getCreateTimestamp().getRight());
+            sb.append(v.Size().getRight());
 
-        while (set.iterator().hasNext()) {
-            Column axis = set.iterator().next();
-
-            while (axis.getRows().)
-            sb.append(axis.getColName());
-            sb.append(axis.getRows().getRowColumnID());
-            sb.append(axis.getRows().getCreateTimestamp().getRight());
-            sb.append(axis.getRows().Size().getRight());
-            sb.append(axis.getRows().KeySet().getRight());
-            sb.append(axis.getRows().Values().getRight());
-        }
-
-        Block timeBlock = new Block(sb.toString().getBytes());
+            v.getKeyValues().forEach((k1, v1) -> {
+                sb.append(k1);
+                sb.append(v1);
+            });
+        });
 
         try {
+            Block timeBlock = new Block(sb.toString().getBytes());
             rocksDB.put(timeBlock.getTimeStamp().getBytes(), timeBlock.toBytes());
-            maps.asMap().forEach((k, v) -> map.forEach((k1, v1) -> {
-                if (k1.contains(k) && v1.getRows().equals(v.getRows()))
-                    maps.asMap().remove(k, v);
-            }));
         } catch (RocksDBException e) {
             e.printStackTrace();
         }

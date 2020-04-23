@@ -1,27 +1,21 @@
-package org.NauhWuun.times.RowCols;
+package org.NauhWuun.times;
 
 import org.NauhWuun.times.Until.Pair;
 import org.NauhWuun.times.Until.RockRand;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public final class Rows
+public final class RowCol
 {
     private final long id;
     private final long initTimeStamp;
 
     private final SortedMap<Object, Object> tags;
 
-    public Rows() {
+    public RowCol() {
         this.initTimeStamp = date2Stamp(createdateTime());
         this.id = RockRand.getUnsignedLong();
 
@@ -95,17 +89,16 @@ public final class Rows
 
     public final Long getRowColumnID() { return id; }
 
+    public Map<Object, Object> getKeyValues() {
+        Map<Object, Object> maps = new HashMap<>(tags.size());
+        maps.putAll(tags);
+        return maps;
+    }
+
     public static String createdateTime() {
         return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").format(new Date());
     }
 
-    /**
-     *
-     * @param strings           timeStamp Character
-     * @param dateType          yyyy-MM-dd'T'HH:mm:ss z
-     * @return                  user defined type
-     * @throws ParseException
-     */
     public static String getTimeStampSubType(String strings, String dateType) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z");
         Date date = format.parse(strings);
@@ -133,9 +126,9 @@ public final class Rows
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof Rows)) return false;
+        if (! (o instanceof RowCol)) return false;
 
-        Rows rc = (Rows) o;
+        RowCol rc = (RowCol) o;
         return id == rc.id;
     }
 
