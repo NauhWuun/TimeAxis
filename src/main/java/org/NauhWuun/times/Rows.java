@@ -21,25 +21,8 @@ public final class Rows
         this.tags = new TreeMap<>();
     }
 
-    public Pair<Long, Boolean> containsTag(Object tag) {
-        return new Pair<>(date2Stamp(createdateTime()), tags.containsKey(tag));
-    }
-
     public void Put(final String tag, Object value) {
         tags.put(tag, value);
-    }
-
-    public Pair<Long, Long> Remove(final String tag) {
-        tags.remove(tag);
-        return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
-    }
-
-    public Pair<Long, Map<Object, Object>> Of(final String tag, Object value) {
-        return new Pair<>(date2Stamp(createdateTime()), Map.of(tag, value));
-    }
-
-    public Pair<Long, Boolean> Replace(final String tag, Object oldValue, Object newValue) {
-        return new Pair<>(date2Stamp(createdateTime()), tags.replace(tag, oldValue, newValue));
     }
 
     public Pair<Long, Set<Object>> keySet() {
@@ -50,13 +33,11 @@ public final class Rows
        return new Pair<>(date2Stamp(createdateTime()), tags.values());
     }
 
-    public Pair<Long, Object> getTag(String tag) {
+    public Pair<Long, Object> getValue(String tag) {
         return new Pair<>(date2Stamp(createdateTime()), tags.get(tag));
     }
 
     public Pair<Long, Long> Clear() { return new Pair<>(0L, 0L); }
-
-    public void putAll(Map<?, ?> m) { tags.putAll(m); }
 
     public Pair<Long, Object> firstKey() {
         return new Pair<>(date2Stamp(createdateTime()), tags.firstKey());
@@ -70,8 +51,8 @@ public final class Rows
         return new Pair<>(date2Stamp(createdateTime()), tags.isEmpty());
     }
 
-    public Pair<Long, Integer> Size() {
-        return new Pair<>(date2Stamp(createdateTime()), tags.size());
+    public int Size() {
+        return tags.size();
     }
 
     public Pair<Long, Long> getCreateTimestamp() {

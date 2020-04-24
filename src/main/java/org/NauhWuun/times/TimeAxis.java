@@ -7,27 +7,24 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.rocksdb.*;
 
-import javax.swing.plaf.TableHeaderUI;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.*;
 
 public final class TimeAxis implements AutoCloseable
 {
-    private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
-    private static final Map<String, Rows> maps = new LinkedHashMap<>(102400) {
+    private static final Map<String, Rows> maps = new LinkedHashMap<>() {
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, Rows> eldest) {
-            return size() >= 1000000000;
+            return size() >= 1024000;
         }
     };
 
-    private static final WeakHashMap<String, Rows> shadowMap = new WeakHashMap<>();
-
+    @Deprecated
     private static final int WINDOW_WHEEL = 10;
+
     private static final String dbName = "TimeAxisDataBase";
     private static RocksDB rocksDB;
     private static RocksIterator iter;
@@ -39,13 +36,9 @@ public final class TimeAxis implements AutoCloseable
     public TimeAxis() {
         Options options = new Options();
         options.setCreateIfMissing(true);
-        options.setAllowMmapReads(true);
-        options.setAllowMmapWrites(true);
-        options.allowFAllocate();
         options.setAtomicFlush(true);
-        options.setDbLogDir("./logs");
-        options.setInfoLogLevel(InfoLogLevel.INFO_LEVEL);
-        options.setCompressionOptions(new CompressionOptions().setLevel(2));
+        options.setCompressionType(CompressionType.SNAPPY_COMPRESSION);
+        options.setCompactionStyle(CompactionStyle.UNIVERSAL);
 
         try {
             rocksDB = RocksDB.open(options, dbName);
@@ -53,20 +46,34 @@ public final class TimeAxis implements AutoCloseable
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
-
-        freezing.scheduleAtFixedRate(TimeAxis::autoFreezing, 0, WINDOW_WHEEL, TimeUnit.SECONDS);
     }
 
-    public void addValue(final String name, final String tag, final Object value) {
-        if (maps.size() == 1024) {
-            System.out.println("system is fulllllllllllllll");
-            shadowMap.putAll(maps);
+    public void addValue(final String name, String tag, Object value) {
+        if (maps.get(name) != null && maps.get(name).Size() >= 1024000) {
+            StringBuilder sb = new StringBuilder();
+            maps.forEach((k, v) -> {
+                sb.append(k);
+                sb.append(v.getRowColumnID());
+                sb.append(v.getCreateTimestamp().getRight());
+                sb.append(v.Size());
+
+                v.getKeyValues().forEach((k1, v1) -> {
+                    sb.append(k1);
+                    sb.append(v1);
+                });
+            });
+
+            final Block timeBlock = new Block(sb.toString().getBytes());
+            try {
+                rocksDB.put(timeBlock.getTimeStamp().getBytes(), timeBlock.toBytes());
+            } catch (RocksDBException e) {
+                e.printStackTrace();
+            }
         }
 
-        if (! maps.containsKey(tag)) {
+        if (maps.get(name) == null) {
             maps.put(name, new Rows());
         }
-
         maps.get(name).Put(tag, value);
     }
 
@@ -93,41 +100,9 @@ public final class TimeAxis implements AutoCloseable
 		return map;
     }
 
-    private static void autoFreezing() {
-        if (shadowMap.isEmpty()) return;
-
-        StringBuilder sb = new StringBuilder();
-        shadowMap.forEach((k, v) -> {
-            sb.append(k);
-            sb.append(v.getRowColumnID());
-            sb.append(v.getCreateTimestamp().getRight());
-            sb.append(v.Size().getRight());
-
-            v.getKeyValues().forEach((k1, v1) -> {
-                sb.append(k1);
-                sb.append(v1);
-            });
-
-            maps.remove(k, v);
-            shadowMap.remove(k, v);
-        });
-
-        try {
-            Block timeBlock = new Block(sb.toString().getBytes());
-            rocksDB.put(timeBlock.getTimeStamp().getBytes(), timeBlock.toBytes());
-            System.out.println("rock db okay!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        } catch (RocksDBException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static RocksIterator getDBIterator() { return iter; }
-
     @Override
     public synchronized void close() {
         System.out.println("ShutDown Time-Axis... \r\n");
-        freezing.shutdownNow();
-        autoFreezing();
     }
 
     @Override

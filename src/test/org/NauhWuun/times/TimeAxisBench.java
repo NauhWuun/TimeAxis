@@ -1,6 +1,8 @@
 package org.NauhWuun.times;
 
+import org.NauhWuun.times.Until.RockRand;
 import org.apache.commons.csv.CSVRecord;
+import org.rocksdb.RocksDBException;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,7 +17,7 @@ public class TimeAxisBench
 		timeAxis = new TimeAxis();
 	}
 
-	void addValue(final String name, final String tag, final Object value) throws InterruptedException {
+	void addValue(final String name, final String tag, final String value) {
 		timeAxis.addValue(name, tag, value);
 	}
 
@@ -27,10 +29,12 @@ public class TimeAxisBench
 		TimeAxis.csvWriter(csvFile, fileHeader, content);
 	}
 
-	public static void main(String... main) throws InterruptedException {
+	public static void main(String... main) throws RocksDBException {
 		TimeAxisBench tx = new TimeAxisBench();
-		for (int i = 0; i < TEST_NUMBER; i++) {
-			tx.addValue("test" + i, "test " + i, "test " + i);
+//		for (int i = 0; i < TEST_NUMBER; i++)
+		while (true)
+		{
+			tx.addValue("test" + RockRand.nextInt(), "test " + RockRand.nextInt(), "test " + RockRand.nextInt());
 		}
 	}
 }
