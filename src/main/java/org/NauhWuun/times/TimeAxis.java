@@ -1,7 +1,5 @@
 package org.NauhWuun.times;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.NauhWuun.times.Blocks.Block;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -9,6 +7,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.rocksdb.*;
 
+import javax.swing.plaf.TableHeaderUI;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,11 +18,16 @@ import java.util.concurrent.*;
 public final class TimeAxis implements AutoCloseable
 {
     private static final ScheduledExecutorService freezing = Executors.newSingleThreadScheduledExecutor();
-    private static final Cache<String, RowCol> maps = Caffeine.newBuilder()
-            .maximumSize(1024 * 1024 * 500)
-            .build();
+    private static final Map<String, Rows> maps = new LinkedHashMap<>(102400) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Rows> eldest) {
+            return size() >= 1000000000;
+        }
+    };
 
-    private static final int WINDOW_WHEEL = 30;
+    private static final WeakHashMap<String, Rows> shadowMap = new WeakHashMap<>();
+
+    private static final int WINDOW_WHEEL = 10;
     private static final String dbName = "TimeAxisDataBase";
     private static RocksDB rocksDB;
     private static RocksIterator iter;
@@ -54,7 +58,16 @@ public final class TimeAxis implements AutoCloseable
     }
 
     public void addValue(final String name, final String tag, final Object value) {
-        Objects.requireNonNull(maps.getIfPresent(name)).Put(tag, value);
+        if (maps.size() == 1024) {
+            System.out.println("system is fulllllllllllllll");
+            shadowMap.putAll(maps);
+        }
+
+        if (! maps.containsKey(tag)) {
+            maps.put(name, new Rows());
+        }
+
+        maps.get(name).Put(tag, value);
     }
 
     public static List<CSVRecord> csvReader(final String csvFile, final String[] fileHeader, boolean skipHeader) throws IOException {
@@ -67,24 +80,24 @@ public final class TimeAxis implements AutoCloseable
         new CSVPrinter(Files.newBufferedWriter(Paths.get(csvFile)), CSVFormat.DEFAULT.withHeader(fileHeader)).flush();
     }
 
-    protected static HashMap<String, RowCol> InvertedMap() {
-		Set<Entry<String, RowCol>> set = maps.asMap().entrySet();
-		ArrayList<Entry<String, RowCol>> arrayList = new ArrayList<>(set);
+    protected static HashMap<String, Rows> getSortMaps() {
+		Set<Entry<String, Rows>> set = maps.entrySet();
+		ArrayList<Entry<String, Rows>> arrayList = new ArrayList<>(set);
 
         arrayList.sort((arg0, arg1) ->
             (arg1.getValue().getCurrentTimestamp())
                 .compareTo(arg0.getValue().getCurrentTimestamp()));
 
-        LinkedHashMap<String, RowCol> map = new LinkedHashMap<>();
+        LinkedHashMap<String, Rows> map = new LinkedHashMap<>();
         arrayList.forEach(k -> map.put(k.getKey(), k.getValue()));
 		return map;
     }
 
     private static void autoFreezing() {
-        if (maps.asMap().isEmpty()) return;
+        if (shadowMap.isEmpty()) return;
 
         StringBuilder sb = new StringBuilder();
-        maps.asMap().forEach((k, v) -> {
+        shadowMap.forEach((k, v) -> {
             sb.append(k);
             sb.append(v.getRowColumnID());
             sb.append(v.getCreateTimestamp().getRight());
@@ -94,11 +107,15 @@ public final class TimeAxis implements AutoCloseable
                 sb.append(k1);
                 sb.append(v1);
             });
+
+            maps.remove(k, v);
+            shadowMap.remove(k, v);
         });
 
         try {
             Block timeBlock = new Block(sb.toString().getBytes());
             rocksDB.put(timeBlock.getTimeStamp().getBytes(), timeBlock.toBytes());
+            System.out.println("rock db okay!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         } catch (RocksDBException e) {
             e.printStackTrace();
         }
@@ -107,7 +124,7 @@ public final class TimeAxis implements AutoCloseable
     public static RocksIterator getDBIterator() { return iter; }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         System.out.println("ShutDown Time-Axis... \r\n");
         freezing.shutdownNow();
         autoFreezing();

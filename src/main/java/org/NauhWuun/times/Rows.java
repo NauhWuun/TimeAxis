@@ -8,18 +8,17 @@ import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public final class RowCol
+public final class Rows
 {
     private final long id;
     private final long initTimeStamp;
 
     private final SortedMap<Object, Object> tags;
 
-    public RowCol() {
+    public Rows() {
         this.initTimeStamp = date2Stamp(createdateTime());
         this.id = RockRand.getUnsignedLong();
-
-        tags = new TreeMap<>();
+        this.tags = new TreeMap<>();
     }
 
     public Pair<Long, Boolean> containsTag(Object tag) {
@@ -30,12 +29,12 @@ public final class RowCol
         tags.put(tag, value);
     }
 
-    public Pair<Long, Long> remove(final String tag) {
+    public Pair<Long, Long> Remove(final String tag) {
         tags.remove(tag);
         return new Pair<>(date2Stamp(createdateTime()), date2Stamp(createdateTime()));
     }
 
-    public Pair<Long, Map<Object, Object>> of(final String tag, Object value) {
+    public Pair<Long, Map<Object, Object>> Of(final String tag, Object value) {
         return new Pair<>(date2Stamp(createdateTime()), Map.of(tag, value));
     }
 
@@ -43,7 +42,7 @@ public final class RowCol
         return new Pair<>(date2Stamp(createdateTime()), tags.replace(tag, oldValue, newValue));
     }
 
-    public Pair<Long, Set<Object>> KeySet() {
+    public Pair<Long, Set<Object>> keySet() {
         return new Pair<>(date2Stamp(createdateTime()), tags.keySet());
     }
 
@@ -57,17 +56,17 @@ public final class RowCol
 
     public Pair<Long, Long> Clear() { return new Pair<>(0L, 0L); }
 
-    public void PutAll(Map<?, ?> m) { tags.putAll(m); }
+    public void putAll(Map<?, ?> m) { tags.putAll(m); }
 
-    public Pair<Long, Object> FirstKey() {
+    public Pair<Long, Object> firstKey() {
         return new Pair<>(date2Stamp(createdateTime()), tags.firstKey());
     }
 
-    public Pair<Long, Object> LastKey() {        
+    public Pair<Long, Object> lastKey() {
         return new Pair<>(date2Stamp(createdateTime()), tags.lastKey());
     }
 
-    public Pair<Long, Boolean> IsEmpty() {
+    public Pair<Long, Boolean> isEmpty() {
         return new Pair<>(date2Stamp(createdateTime()), tags.isEmpty());
     }
 
@@ -76,7 +75,7 @@ public final class RowCol
     }
 
     public Pair<Long, Long> getCreateTimestamp() {
-        return new Pair<>(date2Stamp(createdateTime()), initTimeStamp);
+        return new Pair<>(initTimeStamp, initTimeStamp);
     }
 
     public Pair<Long, String> getFormatTimeStamp() {
@@ -126,9 +125,9 @@ public final class RowCol
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof RowCol)) return false;
+        if (! (o instanceof Rows)) return false;
 
-        RowCol rc = (RowCol) o;
+        Rows rc = (Rows) o;
         return id == rc.id;
     }
 
