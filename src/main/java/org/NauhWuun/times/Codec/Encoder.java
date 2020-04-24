@@ -3,7 +3,7 @@ package org.NauhWuun.times.Codec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class Encoder 
+public final class Encoder
 {
     private final ByteArrayOutputStream out;
 

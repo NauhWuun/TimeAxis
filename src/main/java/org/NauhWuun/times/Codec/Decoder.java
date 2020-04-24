@@ -2,7 +2,7 @@ package org.NauhWuun.times.Codec;
 
 import java.io.UnsupportedEncodingException;
 
-public class Decoder 
+public final class Decoder
 {
     private static final String ENCODING = "UTF-8";
 

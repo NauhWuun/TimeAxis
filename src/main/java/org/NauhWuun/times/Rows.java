@@ -21,63 +21,41 @@ public final class Rows
         this.tags = new TreeMap<>();
     }
 
-    public void Put(final String tag, Object value) {
-        tags.put(tag, value);
-    }
+    public void Put(final String tag, Object value) { tags.put(tag, value); }
 
-    public Pair<Long, Set<Object>> keySet() {
-        return new Pair<>(date2Stamp(createdateTime()), tags.keySet());
-    }
+    public Pair<Long, Set<Object>> keySet() { return new Pair<>(date2Stamp(createdateTime()), tags.keySet()); }
 
-    public Pair<Long, Collection<Object>> Values() {
-       return new Pair<>(date2Stamp(createdateTime()), tags.values());
-    }
+    public Pair<Long, Collection<Object>> Values() { return new Pair<>(date2Stamp(createdateTime()), tags.values()); }
 
-    public Pair<Long, Object> getValue(String tag) {
-        return new Pair<>(date2Stamp(createdateTime()), tags.get(tag));
-    }
+    public Pair<Long, Object> getValue(String tag) { return new Pair<>(date2Stamp(createdateTime()), tags.get(tag)); }
 
     public Pair<Long, Long> Clear() { return new Pair<>(0L, 0L); }
 
-    public Pair<Long, Object> firstKey() {
-        return new Pair<>(date2Stamp(createdateTime()), tags.firstKey());
-    }
+    public Pair<Long, Object> firstKey() { return new Pair<>(date2Stamp(createdateTime()), tags.firstKey()); }
 
-    public Pair<Long, Object> lastKey() {
-        return new Pair<>(date2Stamp(createdateTime()), tags.lastKey());
-    }
+    public Pair<Long, Object> lastKey() { return new Pair<>(date2Stamp(createdateTime()), tags.lastKey()); }
 
-    public Pair<Long, Boolean> isEmpty() {
-        return new Pair<>(date2Stamp(createdateTime()), tags.isEmpty());
-    }
+    public Pair<Long, Boolean> isEmpty() { return new Pair<>(date2Stamp(createdateTime()), tags.isEmpty()); }
 
-    public int Size() {
-        return tags.size();
-    }
+    public int Size() { return tags.size(); }
 
-    public Pair<Long, Long> getCreateTimestamp() {
-        return new Pair<>(initTimeStamp, initTimeStamp);
-    }
+    public Pair<Long, Long> getCreateTimestamp() { return new Pair<>(initTimeStamp, initTimeStamp); }
 
     public Pair<Long, String> getFormatTimeStamp() {
         return new Pair<>(date2Stamp(createdateTime()), stamp2Date(initTimeStamp));
     }
 
-    public Long getCurrentTimestamp() {
-        return date2Stamp(createdateTime());
-    }
+    public Long getCurrentTimestamp() { return date2Stamp(createdateTime()); }
 
     public final Long getRowColumnID() { return id; }
 
-    public Map<Object, Object> getKeyValues() {
+    protected Map<Object, Object> getKeyValues() {
         Map<Object, Object> maps = new HashMap<>(tags.size());
         maps.putAll(tags);
         return maps;
     }
 
-    public static String createdateTime() {
-        return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").format(new Date());
-    }
+    public static String createdateTime() { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z").format(new Date()); }
 
     public static String getTimeStampSubType(String strings, String dateType) throws ParseException {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss z");
@@ -113,7 +91,5 @@ public final class Rows
     }
 
     @Override
-    public int hashCode() {
-        return (int) id;
-    }
+    public int hashCode() { return (int) id; }
 }

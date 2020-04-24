@@ -22,9 +22,6 @@ public final class TimeAxis implements AutoCloseable
         }
     };
 
-    @Deprecated
-    private static final int WINDOW_WHEEL = 10;
-
     private static final String dbName = "TimeAxisDataBase";
     private static RocksDB rocksDB;
     private static RocksIterator iter;
@@ -87,6 +84,7 @@ public final class TimeAxis implements AutoCloseable
         new CSVPrinter(Files.newBufferedWriter(Paths.get(csvFile)), CSVFormat.DEFAULT.withHeader(fileHeader)).flush();
     }
 
+    @Deprecated
     protected static HashMap<String, Rows> getSortMaps() {
 		Set<Entry<String, Rows>> set = maps.entrySet();
 		ArrayList<Entry<String, Rows>> arrayList = new ArrayList<>(set);
@@ -101,7 +99,7 @@ public final class TimeAxis implements AutoCloseable
     }
 
     @Override
-    public synchronized void close() {
+    public void close() {
         System.out.println("ShutDown Time-Axis... \r\n");
     }
 

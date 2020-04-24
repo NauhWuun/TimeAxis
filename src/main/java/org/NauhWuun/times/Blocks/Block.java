@@ -6,7 +6,7 @@ import org.NauhWuun.times.Rows;
 
 import java.util.Arrays;
 
-public class Block
+public final class Block
 {
     private static final long FNV_64_INIT  = 0xcbf29ce484222325L;
     private static final long FNV_64_PRIME = 0x100000001b3L;
