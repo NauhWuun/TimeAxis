@@ -1,4 +1,4 @@
-package org.NauhWuun.times.Until;
+package org.NauhWuun.times;
 
 import java.security.SecureRandom;
 

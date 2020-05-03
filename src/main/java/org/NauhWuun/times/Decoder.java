@@ -1,6 +1,4 @@
-package org.NauhWuun.times.Codec;
-
-import java.io.UnsupportedEncodingException;
+package org.NauhWuun.times;
 
 public final class Decoder
 {
@@ -27,31 +25,9 @@ public final class Decoder
         this.index = from;
     }
 
-    public boolean readBoolean() {
-        require(1);
-        return in[index++] != 0;
-    }
-
-    public byte readByte() {
-        require(1);
-        return in[index++];
-    }
-
-    public short readShort() {
-        require(2);
-        return (short) ((in[index++] & 0xFF) << 8 | (in[index++] & 0xFF));
-    }
-
     public int readInt() {
         require(4);
         return in[index++] << 24 | (in[index++] & 0xFF) << 16 | (in[index++] & 0xFF) << 8 | (in[index++] & 0xFF);
-    }
-
-    public long readLong() {
-        int i1 = readInt();
-        int i2 = readInt();
-
-        return (unsignedInt(i1) << 32) | unsignedInt(i2);
     }
 
     public byte[] readBytes(boolean vlq) {
@@ -67,18 +43,6 @@ public final class Decoder
 
     public byte[] readBytes() {
         return readBytes(true);
-    }
-
-    public String readString() {
-        try {
-            return new String(readBytes(), ENCODING);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    public int getReadIndex() {
-        return index;
     }
 
     protected int readSize() {

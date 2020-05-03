@@ -1,6 +1,6 @@
-package org.NauhWuun.times.Until;
+package org.NauhWuun.times;
 
-public class Pair<Left, Right>
+public final class Pair<Left, Right>
 {
     private Left left;
     private Right right;
