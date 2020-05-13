@@ -2,33 +2,34 @@ package org.NauhWuun.times;
 
 import org.rocksdb.RocksDBException;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public final class STable
 {
-	private TreeMap<KEY, VALUE> c2;
+	private STable() {}
 
-	public STable() {
-		c2 = new TreeMap<>();
-	}
+	public static STable createInstance() { return new STable(); }
 
-	public void merge(Object obj) {
-		TreeMap<KEY, VALUE> c02 = (TreeMap<KEY, VALUE>) obj;
-		for (Map.Entry<KEY, VALUE> v : c02.entrySet()) {
-			c2.put(v.getKey(), v.getValue());
-		}
+	public void merge(ConcurrentSkipListMap<byte[], byte[]> obj) {
+		ConcurrentSkipListMap<byte[], byte[]> c2 = obj;
+		
+		byte[] bytes = null;
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-		StringBuilder sb = new StringBuilder();
-		c2.entrySet().parallelStream().forEach((key) -> {
-			sb.append(key.getKey().getTime());
-			sb.append(key.getValue().getValue());
-		});
-
-		final Block timeBlock = new Block(sb.toString().getBytes());
 		try {
-			TimeAxis.getDBInstance().put(timeBlock.getHash(), timeBlock.toBytes());
-		} catch (RocksDBException e) {
+			ObjectOutputStream oos = new ObjectOutputStream(os);
+			oos.writeObject(c2);
+
+			bytes = os.toByteArray();
+			oos.close();
+			os.close();
+
+			Block tableBlock = new Block(bytes);
+			TimeAxis.getDBInstance().put(RockDB.TIMES, tableBlock.getTimeStamp().getBytes(), tableBlock.toBytes());
+		} catch (RocksDBException | IOException e) {
 			e.printStackTrace();
 		}
 	}

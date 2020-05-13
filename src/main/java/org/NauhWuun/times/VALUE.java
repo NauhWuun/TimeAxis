@@ -4,15 +4,10 @@ public final class VALUE
 {
     byte[] param;
 
-    public VALUE() {
-        this("0");
-    }
-
-    public VALUE(final String params) {
+    private VALUE(String params) {
         param = Bytes.convertToByteArray(params);
     }
 
-    public final String getValue() {
-        return Bytes.ConvertBytesToString(param);
-    }
+    public static VALUE Builder(String value) { return new VALUE(value); }
+    public final String getValue() { return Bytes.ConvertBytesToString(param); }
 }

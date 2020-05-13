@@ -3,8 +3,14 @@ package org.NauhWuun.times;
 public final class KEY
 {
     long dateTime;
+    String key;
 
-    public KEY() { this.setCreatedTime(); }
+    private KEY(String key) { 
+        this.setCreatedTime(); 
+        this.key = key;
+    }
+
+    public static KEY Builder(String key) { return new KEY(key); }
 
     private void setCreatedTime() { dateTime = System.currentTimeMillis(); }
 
@@ -15,4 +21,6 @@ public final class KEY
     public Boolean validator() {
         return dateTime > 0;
     }
+
+    public String getKey() { return key; }
 }

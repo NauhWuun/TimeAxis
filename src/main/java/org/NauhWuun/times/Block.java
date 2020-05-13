@@ -4,12 +4,11 @@ import java.util.Arrays;
 
 public final class Block
 {
-    private static final long FNV_64_INIT  = 0xcbf29ce484222325L;
-    private static final long FNV_64_PRIME = 0x100000001b3L;
-
     private final byte[] hash;
     private final byte[] data;
     private final byte[] encoded;
+
+    private String timeStamp;
 
     public Block(final byte[] data) {
         this.data = data;
@@ -18,6 +17,7 @@ public final class Block
         enc.writeBytes(data);
         this.encoded = enc.toBytes();
         this.hash = Bytes.convertToByteArray(HashAlgorithm.FNV1A_64_HASH(Arrays.toString(encoded)));
+        this.timeStamp = String.valueOf(System.currentTimeMillis());
     }
 
     public Block(final byte[] hash, final byte[] encoded) {
@@ -33,6 +33,10 @@ public final class Block
     }
     public byte[] getData() {
         return data;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
     }
 
     public byte[] toBytes() {
