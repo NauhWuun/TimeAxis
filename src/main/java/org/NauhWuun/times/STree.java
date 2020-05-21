@@ -21,12 +21,7 @@ public final class STree
         if (c0.size() == MAX_TREE_NODES_COUNT) {
             ConcurrentSkipListMap<byte[], byte[]> c01 = c0.clone();
             
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    STable.createInstance().merge(c01);
-                }
-            });
+            executorService.execute(() -> STable.createInstance().merge(c01));
 
             c0.clear();
         }

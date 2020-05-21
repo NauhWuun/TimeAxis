@@ -44,11 +44,7 @@ public class RockDB
 
         cfd = new ArrayList<>();
         cfd.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, new ColumnFamilyOptions()));
-        cfd.add(new ColumnFamilyDescriptor("cf_tx".getBytes(),    new ColumnFamilyOptions()));
-        cfd.add(new ColumnFamilyDescriptor("cf_bus".getBytes(),   new ColumnFamilyOptions()));
-        cfd.add(new ColumnFamilyDescriptor("cf_acc".getBytes(),   new ColumnFamilyOptions()));
-        cfd.add(new ColumnFamilyDescriptor("cf_token".getBytes(), new ColumnFamilyOptions()));
-        cfd.add(new ColumnFamilyDescriptor("cf_pr".getBytes(), new ColumnFamilyOptions()));
+        cfd.add(new ColumnFamilyDescriptor("times".getBytes(), new ColumnFamilyOptions()));
 
         cfh = new ArrayList<>();
 
