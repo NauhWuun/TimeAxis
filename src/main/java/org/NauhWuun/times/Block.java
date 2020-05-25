@@ -8,8 +8,6 @@ public final class Block
     private final byte[] data;
     private final byte[] encoded;
 
-    private String timeStamp;
-
     public Block(final byte[] data) {
         this.data = data;
 
@@ -17,7 +15,6 @@ public final class Block
         enc.writeBytes(data);
         this.encoded = enc.toBytes();
         this.hash = Bytes.convertToByteArray(HashAlgorithm.FNV1A_64_HASH(Arrays.toString(encoded)));
-        this.timeStamp = String.valueOf(System.currentTimeMillis());
     }
 
     public Block(final byte[] hash, final byte[] encoded) {
@@ -33,10 +30,6 @@ public final class Block
     }
     public byte[] getData() {
         return data;
-    }
-
-    public String getTimeStamp() {
-        return timeStamp;
     }
 
     public byte[] toBytes() {
