@@ -30,13 +30,5 @@
     </properties>
 
     <dependencies>
-
-        <!-- rocksdbjni -->
-        <dependency>
-            <groupId>org.rocksdb</groupId>
-            <artifactId>rocksdbjni</artifactId>
-            <version>6.7.3</version>
-        </dependency>
-
     </dependencies>
 </project>

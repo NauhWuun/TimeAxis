@@ -1,30 +1,20 @@
 package org.NauhWuun.times;
 
-import org.rocksdb.RocksDBException;
-
 public final class TimeAxis 
 {
     private static final STree maps = new STree();
-    private static final String dbName = "TimeAxisDataBase";
-    private static RockDB rocksDB;
-
-    public TimeAxis() {
-        try {
-            rocksDB = RockDB.getDatabase(dbName);
-        } catch (RocksDBException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void push(String key, String value) {
-        maps.add(KEY.Builder(key).getKey().getBytes(), VALUE.Builder(value).getValue().getBytes());
+        maps.add(KEY.Builder(key), VALUE.Builder(value));
     }
 
     public void Remove(String key) {
-        maps.delete(key);
+        maps.delete(KEY.Builder(key));
     }
 
-    public static RockDB getDBInstance() { return rocksDB; }
+    public String get(String key) {
+        return maps.get(KEY.Builder(key)).getValue();
+    }
 
     @Override
     public String toString() {

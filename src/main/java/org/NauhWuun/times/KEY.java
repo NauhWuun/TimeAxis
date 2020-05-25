@@ -14,13 +14,9 @@ public final class KEY
 
     private void setCreatedTime() { dateTime = System.currentTimeMillis(); }
 
-    public final long getTime() {
-        return dateTime;
-    }
+    public final long getTime() { return dateTime; }
 
-    public Boolean validator() {
-        return dateTime > 0;
-    }
+    public Boolean validator() { return dateTime > 0; }
 
     public String getKey() { return key; }
 }

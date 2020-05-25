@@ -4,8 +4,8 @@ import java.util.concurrent.*;
 
 public final class STree
 {
-    private final CountMinSketch                        cms;
-    private final ConcurrentSkipListMap<byte[], byte[]> c0;
+    private final CountMinSketch cms;
+    private final ConcurrentSkipListMap<KEY, VALUE> c0;
     private final long MAX_TREE_NODES_COUNT = 1024 * 1024 * 50;
 
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
@@ -15,21 +15,22 @@ public final class STree
         c0  = new ConcurrentSkipListMap<>();
     }
 
-    public void add(byte[] key, byte[] value) {
-        cms.set(key);
+    public void add(KEY key, VALUE value) {
+        cms.setString(key.getKey());
 
         if (c0.size() == MAX_TREE_NODES_COUNT) {
-            ConcurrentSkipListMap<byte[], byte[]> c01 = c0.clone();
-            
+            ConcurrentSkipListMap<KEY, VALUE> c01 = c0.clone();
             executorService.execute(() -> STable.createInstance().merge(c01));
-
             c0.clear();
         }
 
         c0.put(key, value);
     }
 
-    public Object get(String key) { return (c0.get(key.getBytes()) != null || hasKey(key)); }
-    public void delete(String key) { c0.remove(key.getBytes()); }
-    private boolean hasKey(String key) { return cms.getEstimatedCountString(key) > 0; }
+    public VALUE get(KEY key) { 
+        return hasKey(key) ? c0.get(key) : null;
+    }
+
+    public void delete(KEY key) { c0.remove(key); }
+    private boolean hasKey(KEY key) { return cms.getEstimatedCountString(key.getKey()) > 0; }
 }
