@@ -1,7 +1,14 @@
 package org.NauhWuun.times;
 
-public final class KEY
+import java.io.Serializable;
+
+public final class KEY implements Serializable
 {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -1334613540052070801L;
+    
     long dateTime;
     String key;
 

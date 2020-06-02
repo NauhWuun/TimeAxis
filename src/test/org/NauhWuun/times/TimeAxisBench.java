@@ -8,32 +8,7 @@ import java.util.List;
 
 public class TimeAxisBench
 {
-	private static final int TEST_NUMBER = Integer.MAX_VALUE - 1;
-
-	TimeAxis timeAxis;
-
-	TimeAxisBench() {
-		timeAxis = new TimeAxis();
-	}
-
-	void addValue(final String name, final String tag, final String value) {
-		timeAxis.addValue(name, tag, value);
-	}
-
-	List<CSVRecord> csvReader(final String csvFile, final String[] fileHeader, boolean skipHeader) throws IOException {
-		return TimeAxis.csvReader(csvFile, fileHeader, skipHeader);
-	}
-
-	void csvWriter(final String csvFile, final String[] fileHeader, List<String[]> content) throws IOException {
-		TimeAxis.csvWriter(csvFile, fileHeader, content);
-	}
-
 	public static void main(String... main) throws RocksDBException {
-		TimeAxisBench tx = new TimeAxisBench();
-//		for (int i = 0; i < TEST_NUMBER; i++)
-		while (true)
-		{
-			tx.addValue("test" + RockRand.nextInt(), "test " + RockRand.nextInt(), "test " + RockRand.nextInt());
-		}
+		
 	}
 }

@@ -28,6 +28,7 @@ public final class Block
     public byte[] getHash() {
         return hash;
     }
+    
     public byte[] getData() {
         return data;
     }

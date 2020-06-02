@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.rocksdb.RocksDBException;
+
 public final class STable
 {
 	private STable() {}
@@ -13,8 +15,7 @@ public final class STable
 	public static STable createInstance() { return new STable(); }
 
 	public void merge(ConcurrentSkipListMap<KEY, VALUE> obj) {
-		HashMap<KEY, VALUE> c2 = new HashMap<>();
-		c2.putAll(obj);
+		HashMap<KEY, VALUE> c2 = new HashMap<>(obj);
 		
 		byte[] bytes = null;
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -28,9 +29,8 @@ public final class STable
 			os.close();
 
 			Block tableBlock = new Block(bytes);
-			
-			
-		} catch (IOException e) {
+			TimeAxis.db.put(Bytes.convertToByteArray(System.currentTimeMillis()), tableBlock.toBytes());
+		} catch (IOException | RocksDBException e) {
 			e.printStackTrace();
 		}
 	}
