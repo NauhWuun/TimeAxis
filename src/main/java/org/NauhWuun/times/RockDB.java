@@ -32,9 +32,9 @@ public class RockDB
         return rockDB;
     }
 
-    private RocksDB database;
-    private List<ColumnFamilyHandle> cfh;
-    private List<ColumnFamilyDescriptor> cfd;
+    private final RocksDB database;
+    private final List<ColumnFamilyHandle> cfh;
+    private final List<ColumnFamilyDescriptor> cfd;
     private DBOptions options;
 
     private RockDB(String db) throws RocksDBException {
@@ -64,7 +64,7 @@ public class RockDB
     }
 
     public RocksIterator getIter() {
-        return getIter(0);
+        return getIter(TYPE_TRANSACTIONS);
     }
 
     public RocksIterator getIter(int columnFamily) {

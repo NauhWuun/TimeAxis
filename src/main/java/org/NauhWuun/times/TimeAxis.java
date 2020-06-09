@@ -1,6 +1,5 @@
 package org.NauhWuun.times;
 
-import java.io.IOException;
 import java.io.Closeable;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -11,19 +10,19 @@ public class TimeAxis implements Closeable
 {
     private static final String FILENAME = "./time.axis";
     static RockDB db;
-    static final ExecutorService executorService = Executors.newFixedThreadPool(2 << 3);
+    static volatile long fixRateTime = 0;
+    static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     private CountMinSketch cms;
 
     public TimeAxis() {
         try {
             db = RockDB.getDatabase(FILENAME);
             cms = CountMinSketch.deserialize(db.get(RockDB.TYPE_INDEX, "index".getBytes()));
-            if (cms == null) {
-                cms = new CountMinSketch();
-            }
         } catch (RocksDBException e) {
             e.fillInStackTrace();
         }
+
+        executorService.scheduleAtFixedRate(Mapper::Clone, 0, 30 /* 30s Wrapper Times */, TimeUnit.SECONDS);
     }
 
     public void push(String key, String value) {
@@ -31,8 +30,20 @@ public class TimeAxis implements Closeable
         Mapper.add(KEY.Builder(key), VALUE.Builder(value));
     }
 
-    public static Map<Object, Object> getNow() {
-        return Reduce.divergence(Bytes.convertToByteArray(System.currentTimeMillis()));
+    /**
+     *
+     * @param secondTime: 30 seconds per
+     *                    30/60/180/... seconds
+     * @return 30s block key/value data
+     */
+    public Map<Object, Object> poll(long secondTime) {
+        if (secondTime < 30 || secondTime >= Long.MAX_VALUE)
+            secondTime = 30;
+
+        if (secondTime % 30 != 0)
+            secondTime *= 30;
+
+        return Reduce.divergence(Bytes.convertToByteArray(secondTime));
     }
 
     public boolean contains(String key) {
@@ -45,9 +56,8 @@ public class TimeAxis implements Closeable
     }
 
     @Override
-    public void close() throws IOException {
+    public void close()  {
         byte[] serCMS = CountMinSketch.serialize(cms);
-
         try {
             db.put(RockDB.TYPE_INDEX, "index".getBytes(), serCMS);
         } catch (RocksDBException e) {

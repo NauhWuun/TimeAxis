@@ -22,9 +22,9 @@ public final class Bytes
         BitSet bitSet = new BitSet(bytes.length * 8);
         int index = 0;
 
-        for (int i = 0; i < bytes.length; i++) {
+        for (byte aByte : bytes) {
             for (int j = 7; j >= 0; j--) {
-                bitSet.set(index++, (bytes[i] & (1 << j)) >> j == 1);
+                bitSet.set(index++, (aByte & (1 << j)) >> j == 1);
             }
         }
 
@@ -91,48 +91,44 @@ public final class Bytes
         return value;
     }
 
-    private static final void pack(byte[] data, int offs, int val) {
+    private static void pack(byte[] data, int offs, int val) {
         data[offs++] = (byte) val;
     }
 
-    private static final void pack2(byte[] data, int offs, int val) {
+    private static void pack2(byte[] data, int offs, int val) {
         data[offs++] = (byte) (val >> 8);
         data[offs++] = (byte) val;
     }
 
-    private static final void pack4(byte[] data, int offs, int val) {
+    private static void pack4(byte[] data, int offs, int val) {
         data[offs++] = (byte) (val >> 24);
         data[offs++] = (byte) (val >> 16);
         data[offs++] = (byte) (val >> 8);
         data[offs++] = (byte) val;
     }
 
-    private static final void pack8(byte[] data, int offs, long val) {
+    private static void pack8(byte[] data, int offs, long val) {
         pack4(data, 0, (int) (val >> 32));
         pack4(data, 4, (int) val);
     }
 
     private static long unpack8(byte[] buf, int offset) {
-        long value =(buf[offset     ] << 32)                |
-                    (buf[offset +  1] << 24)                |
-                    ((buf[offset + 2] << 16) & 0x00FF0000)  |
-                    ((buf[offset + 3] << 8) & 0x0000FF00)   |
-                    ((buf[offset + 4] << 0) & 0x000000FF)   ;
-        return value;
+        return (buf[offset     ] << 32)                 |
+                (buf[offset +  1] << 24)                |
+                ((buf[offset + 2] << 16) & 0x00FF0000)  |
+                ((buf[offset + 3] << 8) & 0x0000FF00)   |
+                ((buf[offset + 4] << 0) & 0x000000FF);
     }
 
     private static int unpack4(byte[] buf, int offset) {
-        int value = (buf[offset     ] << 24)                |
-                    ((buf[offset + 1] << 16) & 0x00FF0000)  |
-                    ((buf[offset + 2] << 8) & 0x0000FF00)   |
-                    ((buf[offset + 3] << 0) & 0x000000FF)   ;
-        return value;
+        return (buf[offset     ] << 24)                 |
+                ((buf[offset + 1] << 16) & 0x00FF0000)  |
+                ((buf[offset + 2] << 8) & 0x0000FF00)   |
+                ((buf[offset + 3] << 0) & 0x000000FF);
     }
 
     private static short unpack2(byte[] buf, int offset) {
-        short value = (short) (((buf[offset] << 8) & 0x0000FF00)    | 
-                              ((buf[offset + 1] << 0) & 0x000000FF));
-        return value;
+        return (short) (((buf[offset] << 8) & 0x0000FF00) | ((buf[offset + 1] << 0) & 0x000000FF));
     }
 
     private static byte unpack(byte[] buf, int offset) {

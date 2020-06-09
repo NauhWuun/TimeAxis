@@ -10,7 +10,6 @@ public final class Block
 
     public Block(final byte[] data) {
         this.data = data;
-
         Encoder enc = new Encoder();
         enc.writeBytes(data);
         this.encoded = enc.toBytes();
@@ -19,7 +18,6 @@ public final class Block
 
     public Block(final byte[] hash, final byte[] encoded) {
         this.hash = hash;
-
         Decoder dec = new Decoder(encoded);
         this.data = dec.readBytes();
         this.encoded = encoded;
@@ -44,7 +42,6 @@ public final class Block
         Decoder dec = new Decoder(bytes);
         byte[] hash = dec.readBytes();
         byte[] encoded = dec.readBytes();
-
         return new Block(hash, encoded);
     }
 }

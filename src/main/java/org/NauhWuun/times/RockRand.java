@@ -35,7 +35,8 @@ public final class RockRand
 		}
 	}
 
-	public static final class RandomContainer {
+	public static final class RandomContainer
+	{
 		private final Random _random;
 
 		private RandomContainer(final Random random) {
@@ -160,35 +161,35 @@ public final class RockRand
 
 	private static volatile long SEED_UNIQUIFIER = 8682522807148012L;
 
-	public static final Random directRandom() {
+	public static Random directRandom() {
 		return rnd.directRandom();
 	}
 
-	public static final double get() {
+	public static double get() {
 		return rnd.nextDouble();
 	}
 
-	public static final int get(final int n) {
+	public static int get(final int n) {
 		return rnd.get(n);
 	}
 
-	public static final int get(final int min, final int max) {
+	public static int get(final int min, final int max) {
 		return rnd.get(min, max);
 	}
 
-	public static final long get(final long min, final long max) {
+	public static long get(final long min, final long max) {
 		return rnd.get(min, max);
 	}
 
-	public static final long getUnsignedLong() {
+	public static long getUnsignedLong() {
 		return RockRand.get(0L, 0x7ffffffffffffffeL);
 	}
 
-	public static final long getUnsignedLongRound(int min, int max) {
+	public static long getUnsignedLongRound(int min, int max) {
 		return RockRand.get(min, max);
 	}
 
-	public static final RandomContainer newInstance(final RandomType type) {
+	public static RandomContainer newInstance(final RandomType type) {
 		switch (type) {
 		case UNSECURE_ATOMIC:
 			return new RandomContainer(new Random());
@@ -206,35 +207,35 @@ public final class RockRand
 		throw new IllegalArgumentException();
 	}
 
-	public static final boolean nextBoolean() {
+	public static boolean nextBoolean() {
 		return rnd.nextBoolean();
 	}
 
-	public static final void nextBytes(final byte[] array) {
+	public static void nextBytes(final byte[] array) {
 		rnd.nextBytes(array);
 	}
 
-	public static final double nextDouble() {
+	public static double nextDouble() {
 		return rnd.nextDouble();
 	}
 
-	public static final float nextFloat() {
+	public static float nextFloat() {
 		return rnd.nextFloat();
 	}
 
-	public static final double nextGaussian() {
+	public static double nextGaussian() {
 		return rnd.nextGaussian();
 	}
 
-	public static final int nextInt() {
+	public static int nextInt() {
 		return rnd.nextInt();
 	}
 
-	public static final int nextInt(final int n) {
+	public static int nextInt(final int n) {
 		return get(n);
 	}
 
-	public static final long nextLong() {
+	public static long nextLong() {
 		return rnd.nextLong();
 	}
 }
