@@ -2,25 +2,25 @@ package org.NauhWuun.times;
 
 import java.io.IOException;
 import java.io.Closeable;
+import java.util.Map;
 import java.util.concurrent.*;
 
 import org.rocksdb.RocksDBException;
 
-public final class TimeAxis implements Closeable
+public class TimeAxis implements Closeable
 {
-    private static final STree maps = new STree();
-    private final CountMinSketch cms;
-
     private static final String FILENAME = "./time.axis";
-    public static RockDB db;
-
-    public static final ExecutorService executorService = Executors.newFixedThreadPool(2 << 3);
+    static RockDB db;
+    static final ExecutorService executorService = Executors.newFixedThreadPool(2 << 3);
+    private CountMinSketch cms;
 
     public TimeAxis() {
-        // cms = CountMinSketch.deserialize(serialized);
-
         try {
             db = RockDB.getDatabase(FILENAME);
+            cms = CountMinSketch.deserialize(db.get(RockDB.TYPE_INDEX, "index".getBytes()));
+            if (cms == null) {
+                cms = new CountMinSketch();
+            }
         } catch (RocksDBException e) {
             e.fillInStackTrace();
         }
@@ -28,14 +28,14 @@ public final class TimeAxis implements Closeable
 
     public void push(String key, String value) {
         cms.setString(key);
-        maps.add(KEY.Builder(key), VALUE.Builder(value));
+        Mapper.add(KEY.Builder(key), VALUE.Builder(value));
     }
 
-    public String get() {
-        
+    public static Map<Object, Object> getNow() {
+        return Reduce.divergence(Bytes.convertToByteArray(System.currentTimeMillis()));
     }
 
-    public boolean hasKey(String key) {
+    public boolean contains(String key) {
         return cms.getEstimatedCountString(key) > 0;
     }
 
@@ -47,5 +47,11 @@ public final class TimeAxis implements Closeable
     @Override
     public void close() throws IOException {
         byte[] serCMS = CountMinSketch.serialize(cms);
+
+        try {
+            db.put(RockDB.TYPE_INDEX, "index".getBytes(), serCMS);
+        } catch (RocksDBException e) {
+            e.printStackTrace();
+        }
     }
 }
