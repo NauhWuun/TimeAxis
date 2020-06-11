@@ -1,13 +1,13 @@
 package org.NauhWuun.times;
 
 import java.io.Closeable;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.*;
 
 import org.rocksdb.RocksDBException;
 
-public class TimeAxis implements Closeable
-{
+public class TimeAxis implements Closeable {
     private static final String FILENAME = "./time.axis";
     static RockDB db;
     static volatile long fixRateTime = 0;
@@ -32,8 +32,7 @@ public class TimeAxis implements Closeable
 
     /**
      *
-     * @param secondTime: 30 seconds per
-     *                    30/60/180/... seconds
+     * @param secondTime: 30 seconds per 30/60/180/... seconds
      * @return 30s block key/value data
      */
     public static Map<Object, Object> poll(long secondTime) {
@@ -50,9 +49,21 @@ public class TimeAxis implements Closeable
         return Reduce.divergence(db.getLast(RockDB.TYPE_TRANSACTIONS).key());
     }
 
-    public static Map getMax() {
+    public static Map<Object, Object> getMin() {
+        Map<Object, Object> maps = poll(0);
+        return maps.isEmpty() ? null : (Map<Object, Object>) maps.entrySet().iterator().next();
+    }
+
+    public static Map<Object, Object> getMax() {
         Map<Object, Object> maps = pollLast();
-        maps.
+        Field tail;
+        try {
+            tail = maps.getClass().getDeclaredField("tail");
+            tail.setAccessible(true);
+        } catch (NoSuchFieldException | SecurityException e) {
+            e.printStackTrace();
+        }
+        return (Map<Object, Object>) tail.get(maps);
     }
 
     public static long getCount() {
@@ -61,6 +72,15 @@ public class TimeAxis implements Closeable
 
     public boolean contains(String key) {
         return cms.getEstimatedCountString(key) > 0;
+    }
+
+    public static String timeToHour(long dataTime) {
+        if (dataTime < 60)
+            return dataTime + "分钟"; 
+
+	    int hour = Math.round(dataTime / 60);
+	    int minute = Math.round(dataTime - (hour * 60));
+	    return hour + "小时" + (minute == 0 ? "" : minute + "分钟");
     }
 
     @Override

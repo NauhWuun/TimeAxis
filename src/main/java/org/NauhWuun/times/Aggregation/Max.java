@@ -6,8 +6,7 @@ import org.NauhWuun.times.TimeAxis;
 
 public class Max 
 {
-    public static Map maxTimeData() {
-        Map maps = TimeAxis.pollLast();
-        maps.
+    public static Map<Object, Object> maxTimeData() {
+        return TimeAxis.getMax();
     }   
 }
