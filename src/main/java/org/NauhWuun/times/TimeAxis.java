@@ -45,6 +45,21 @@ public class TimeAxis implements Closeable
 
         return Reduce.divergence(Bytes.convertToByteArray(secondTime));
     }
+    
+    /**
+     *
+     * @param start times: current times/second
+              end times: endof times/second
+              per times: a unit of 30/s
+     * @return start to end times all dat int maps
+     */
+    public Map<Object, Object> poll(long start, long end) {
+        Map<?, ?> newMaps = new HashMap<?, ?>();
+        for (; start < end; start += 30) {
+            newMaps.putAll(this.poll(start));
+        }
+        return newMaps;
+    }
 
     public boolean contains(String key) {
         return cms.getEstimatedCountString(key) > 0;
