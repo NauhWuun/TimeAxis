@@ -36,7 +36,7 @@ public class TimeAxis implements Closeable
      *                    30/60/180/... seconds
      * @return 30s block key/value data
      */
-    public Map<Object, Object> poll(long secondTime) {
+    public static Map<Object, Object> poll(long secondTime) {
         if (secondTime < 30 || secondTime >= Long.MAX_VALUE)
             secondTime = 30;
 
@@ -45,20 +45,18 @@ public class TimeAxis implements Closeable
 
         return Reduce.divergence(Bytes.convertToByteArray(secondTime));
     }
-    
-    /**
-     *
-     * @param start times: current times/second
-              end times: endof times/second
-              per times: a unit of 30/s
-     * @return start to end times all dat int maps
-     */
-    public Map<Object, Object> poll(long start, long end) {
-        Map<?, ?> newMaps = new HashMap<?, ?>();
-        for (; start < end; start += 30) {
-            newMaps.putAll(this.poll(start));
-        }
-        return newMaps;
+
+    public static Map<Object, Object> pollLast() {
+        return Reduce.divergence(db.getLast(RockDB.TYPE_TRANSACTIONS).key());
+    }
+
+    public static Map getMax() {
+        Map<Object, Object> maps = pollLast();
+        maps.
+    }
+
+    public static long getCount() {
+        return db.getCount();
     }
 
     public boolean contains(String key) {
@@ -77,6 +75,8 @@ public class TimeAxis implements Closeable
             db.put(RockDB.TYPE_INDEX, "index".getBytes(), serCMS);
         } catch (RocksDBException e) {
             e.printStackTrace();
+        } finally {
+            db.close();
         }
     }
 }

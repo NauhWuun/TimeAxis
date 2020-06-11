@@ -106,7 +106,7 @@ public class RockDB
     }
 
     public long getCount() {
-        return getCount((byte) 0);
+        return getCount((byte) 1);
     }
 
     public long getCount(int columnFamily) {
