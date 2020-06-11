@@ -78,9 +78,9 @@ public class TimeAxis implements Closeable {
         if (dataTime < 60)
             return dataTime + "分钟"; 
 
-	    int hour = Math.round(dataTime / 60);
-	    int minute = Math.round(dataTime - (hour * 60));
-	    return hour + "小时" + (minute == 0 ? "" : minute + "分钟");
+	long hour = Math.round(dataTime / 60);
+	long minute = Math.round(dataTime - (hour * 60));
+	return hour + "小时" + (minute == 0 ? "" : minute + "分钟");
     }
 
     @Override
