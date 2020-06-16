@@ -7,11 +7,13 @@ import java.util.concurrent.*;
 
 import org.rocksdb.RocksDBException;
 
-public class TimeAxis implements Closeable {
-    private static final String FILENAME = "./time.axis";
+public class TimeAxis implements Closeable 
+{
+    static final String FILENAME = "./time.axis";
     static RockDB db;
     static volatile long fixRateTime = 0;
     static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    
     private CountMinSketch cms;
 
     public TimeAxis() {
