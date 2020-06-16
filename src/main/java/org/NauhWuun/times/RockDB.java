@@ -54,7 +54,8 @@ public class RockDB
                       .setCreateMissingColumnFamilies(true)
                       .setCreateIfMissing(true)
                       .setParanoidChecks(true)
-                      .setMaxOpenFiles(256);
+                      .setMaxOpenFiles(256)
+                      .setAtomicFlush(true);
 
         database = RocksDB.open(options, db, cfd, cfh);
     }
@@ -105,9 +106,7 @@ public class RockDB
         database.delete(cfh.get(columnFamily), key);
     }
 
-    public long getCount() {
-        return getCount((byte) 1);
-    }
+    public long getCount() { return getCount(RockDB.TYPE_TRANSACTIONS); }
 
     public long getCount(int columnFamily) {
         long count = 0;

@@ -16,7 +16,7 @@ public class Range
      */
     public static Map<Object, Object> poll(long start, long end) {
         Map<Object, Object> newMaps = new HashMap<>();
-        for (; start < end; start += 30) {
+        for (; start < end; start += 300) {
             newMaps.putAll(TimeAxis.poll(start));
         }
         return newMaps;

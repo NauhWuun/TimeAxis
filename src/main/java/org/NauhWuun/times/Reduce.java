@@ -26,6 +26,8 @@ public final class Reduce
 		} catch (IOException | RocksDBException e) {
 			e.printStackTrace();
 		} finally {
+			System.out.println("merge");
+
 			if (oos != null) {
 				try {
 					oos.close();
@@ -37,7 +39,7 @@ public final class Reduce
 		}
 	}
 
-	public synchronized static Map<Object, Object> divergence(byte[] data) {
+	public synchronized static Map<KEY, VALUE> divergence(byte[] data) {
 		ByteArrayInputStream os = null;
 		ObjectInputStream stream = null;
 		try {
@@ -45,7 +47,7 @@ public final class Reduce
 			Block block = Block.fromBytes(bytes);
 			os = new ByteArrayInputStream(block.getData());
 			stream = new ObjectInputStream(os);
-			return (Map<Object, Object>) stream.readObject();
+			return (Map<KEY, VALUE>) stream.readObject();
 		} catch (IOException | ClassNotFoundException | RocksDBException e) {
 			return null;
 		} finally {

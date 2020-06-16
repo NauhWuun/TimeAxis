@@ -2,7 +2,8 @@ package org.NauhWuun.times;
 
 import java.io.Closeable;
 import java.lang.reflect.Field;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.*;
 
 import org.rocksdb.RocksDBException;
@@ -14,7 +15,7 @@ public class TimeAxis implements Closeable
     static volatile long fixRateTime = 0;
     static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     
-    private CountMinSketch cms;
+    CountMinSketch cms;
 
     public TimeAxis() {
         try {
@@ -23,18 +24,16 @@ public class TimeAxis implements Closeable
                 throw new IllegalArgumentException("cann't open local database file...");
 
             cms = CountMinSketch.deserialize(db.get(RockDB.TYPE_INDEX, "index".getBytes()));
-            if (cms == null) 
+        } catch (RocksDBException | NullPointerException e) {
+            if (cms == null)
                 cms = new CountMinSketch();
-
-        } catch (RocksDBException e) {
-            e.fillInStackTrace();
         }
 
         executorService.scheduleAtFixedRate(Mapper::Clone, 0, 30 /* 30s Wrapper Times */, TimeUnit.SECONDS);
     }
 
     public void push(String key, String value) {
-        cms.set(key.getBytes());
+        cms.setString(key);
         Mapper.add(KEY.Builder(key), VALUE.Builder(value));
     }
 
@@ -43,52 +42,34 @@ public class TimeAxis implements Closeable
      * @param secondTime: 30 seconds per 30/60/180/... seconds
      * @return 30s block key/value data
      */
-    public static Map<Object, Object> poll(long secondTime) {
+    public static Map<KEY, VALUE> poll(long secondTime) {
         if (secondTime < 30 || secondTime >= Long.MAX_VALUE)
-            secondTime = 30;
+            throw new IllegalArgumentException("time value is failed");
 
-        if (secondTime % 30 != 0)
-            secondTime *= 30;
-
-        return Reduce.divergence(Bytes.convertToByteArray(secondTime));
+        return Objects.requireNonNull(Reduce.divergence(Bytes.convertToByteArray(secondTime)));
     }
 
-    public static Map<Object, Object> pollLast() {
+    public static Map<KEY, VALUE> pollLast() {
         return Reduce.divergence(db.getLast(RockDB.TYPE_TRANSACTIONS).key());
     }
 
-    public static Map<Object, Object> getMin() {
-        Map<Object, Object> maps = poll(0);
-        return maps.isEmpty() ? null : (Map<Object, Object>) maps.entrySet().iterator().next();
+    public static long pollLastKey() {
+        return Bytes.ConvertBytesToLong(db.getLast(RockDB.TYPE_TRANSACTIONS).key());
     }
 
-    public static Map<Object, Object> getMax() throws IllegalArgumentException, IllegalAccessException {
-        Map<Object, Object> maps = pollLast();
-        Field tail = null;
-        try {
-            tail = maps.getClass().getDeclaredField("tail");
-            tail.setAccessible(true);
-        } catch (NoSuchFieldException | SecurityException e) {
-            e.printStackTrace();
-        }
-        return (Map<Object, Object>) tail.get(maps);
+    public static long pollFirstKey() {
+        return Bytes.ConvertBytesToLong(db.getFirst(RockDB.TYPE_TRANSACTIONS, null).key());
     }
 
-    public static long getCount() {
-        return db.getCount();
-    }
+    public static long getCount() { return db.getCount(); }
 
-    public boolean contains(String key) {
-        return cms.getEstimatedCount(key.getBytes()) > 0;
-    }
+    public boolean contains(String key) { return cms.getEstimatedCountString(key) == 0; }
 
     public static String timeToHour(long dataTime) {
         if (dataTime < 60)
-            return dataTime + "分钟"; 
-
-	long hour = Math.round(dataTime / 60);
-	long minute = Math.round(dataTime - (hour * 60));
-	return hour + "小时" + (minute == 0 ? "" : minute + "分钟");
+            return dataTime + "秒";
+        return new SimpleDateFormat("yyyy 年 MM 月 dd 日 HH 时 mm 分 ss 秒").format(
+                new Date(Long.parseLong(String.valueOf(dataTime))));
     }
 
     @Override
