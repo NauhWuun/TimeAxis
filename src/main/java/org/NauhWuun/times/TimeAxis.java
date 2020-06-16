@@ -19,7 +19,13 @@ public class TimeAxis implements Closeable
     public TimeAxis() {
         try {
             db = RockDB.getDatabase(FILENAME);
+            if (db == null)
+                throw new IllegalArgumentException("cann't open local database file...");
+
             cms = CountMinSketch.deserialize(db.get(RockDB.TYPE_INDEX, "index".getBytes()));
+            if (cms == null) 
+                cms = new CountMinSketch();
+
         } catch (RocksDBException e) {
             e.fillInStackTrace();
         }
@@ -28,7 +34,7 @@ public class TimeAxis implements Closeable
     }
 
     public void push(String key, String value) {
-        cms.setString(key);
+        cms.set(key.getBytes());
         Mapper.add(KEY.Builder(key), VALUE.Builder(value));
     }
 
@@ -56,9 +62,9 @@ public class TimeAxis implements Closeable
         return maps.isEmpty() ? null : (Map<Object, Object>) maps.entrySet().iterator().next();
     }
 
-    public static Map<Object, Object> getMax() {
+    public static Map<Object, Object> getMax() throws IllegalArgumentException, IllegalAccessException {
         Map<Object, Object> maps = pollLast();
-        Field tail;
+        Field tail = null;
         try {
             tail = maps.getClass().getDeclaredField("tail");
             tail.setAccessible(true);
@@ -73,7 +79,7 @@ public class TimeAxis implements Closeable
     }
 
     public boolean contains(String key) {
-        return cms.getEstimatedCountString(key) > 0;
+        return cms.getEstimatedCount(key.getBytes()) > 0;
     }
 
     public static String timeToHour(long dataTime) {

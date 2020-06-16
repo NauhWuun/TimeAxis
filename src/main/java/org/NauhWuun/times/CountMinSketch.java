@@ -5,8 +5,8 @@ import java.util.Arrays;
 
 public final class CountMinSketch
 {
-    private static final float DEFAULT_DELTA   = 0.01f;
-    private static final float DEFAULT_EPSILON = 0.01f;
+    private static final float DEFAULT_DELTA   = 0.71f;
+    private static final float DEFAULT_EPSILON = 0.81f;
 
     private final int w;
     private final int d;

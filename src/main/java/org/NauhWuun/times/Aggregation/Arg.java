@@ -7,7 +7,7 @@ import org.NauhWuun.times.TimeAxis;
 
 public class Arg 
 {
-    public static String arg() {
+    public static String arg() throws IllegalArgumentException, IllegalAccessException {
         Map maps = TimeAxis.getMax();
         long key = Bytes.ConvertBytesToLong((byte[]) maps.entrySet().iterator().next());
         return TimeAxis.timeToHour(key / 2);
