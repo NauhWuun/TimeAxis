@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.rocksdb.RocksDBException;
 
@@ -12,7 +13,7 @@ public class TimeAxis implements Closeable
 {
     static final String FILENAME = "./time.axis";
     static RockDB db;
-    static volatile long fixRateTime = 0;
+    static AtomicLong fixRateTime = new AtomicLong();
     static final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
     
     CountMinSketch cms;
@@ -68,8 +69,7 @@ public class TimeAxis implements Closeable
     public static String timeToHour(long dataTime) {
         if (dataTime < 60)
             return dataTime + "秒";
-        return new SimpleDateFormat("yyyy 年 MM 月 dd 日 HH 时 mm 分 ss 秒").format(
-                new Date(Long.parseLong(String.valueOf(dataTime))));
+        return TimeUnit.SECONDS.toHours(dataTime) + "/H " + TimeUnit.SECONDS.toMinutes(dataTime) + "/S";
     }
 
     @Override

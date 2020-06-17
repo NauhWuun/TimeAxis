@@ -54,8 +54,7 @@ public class RockDB
                       .setCreateMissingColumnFamilies(true)
                       .setCreateIfMissing(true)
                       .setParanoidChecks(true)
-                      .setMaxOpenFiles(256)
-                      .setAtomicFlush(true);
+                      .setMaxOpenFiles(2048);
 
         database = RocksDB.open(options, db, cfd, cfh);
     }
