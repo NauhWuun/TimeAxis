@@ -11,7 +11,6 @@ public final class Reduce
 	private Reduce() {}
 
 	public synchronized static void merge(byte[] times, Map<KEY, VALUE> obj) {
-		System.out.println("meger");
 		ObjectOutputStream oos = null;
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		try {
@@ -31,8 +30,6 @@ public final class Reduce
 					e.printStackTrace();
 				}
 			}
-
-			System.out.println("meger finish");
 		}
 	}
 

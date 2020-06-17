@@ -17,7 +17,6 @@ public final class Mapper
         if (c0.isEmpty())
             return;
 
-        System.out.println("clone");
         Map<KEY, VALUE> c1 = new ConcurrentHashMap<>(c0);
         Reduce.merge(Bytes.convertToByteArray(TimeAxis.fixRateTime.getAndAdd(30)), c1);
         c0.clear();
